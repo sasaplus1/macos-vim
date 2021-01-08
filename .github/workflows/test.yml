@@ -1,0 +1,15 @@
+name: test
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    name: build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make download-vim
+      - run: make install-vim
+      - run: ./usr/bin/vim --version
