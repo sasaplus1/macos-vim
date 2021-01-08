@@ -7,6 +7,8 @@ makefile_dir := $(dir $(makefile))
 
 root := $(makefile_dir)
 
+prefix := $(root)/usr
+
 vim_version := 8.2.2311
 
 .PHONY: all
@@ -24,6 +26,6 @@ download-vim: ## download Vim archive
 .PHONY: install-vim
 install-vim: ## install Vim
 	tar fvx '$(root)/usr/src/v$(vim_version).tar.gz' -C '$(root)/usr/src/'
-	cd '$(root)/usr/src/vim-$(vim_version)' && ./configure --prefix='$(root)/usr'
+	cd '$(root)/usr/src/vim-$(vim_version)' && ./configure --prefix='$(prefix)'
 	make -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
