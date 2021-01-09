@@ -7,9 +7,31 @@ makefile_dir := $(dir $(makefile))
 
 root := $(makefile_dir)
 
-prefix := $(root)/usr
+prefix := $(abspath $(root)/usr)
 
 vim_version := 8.2.2311
+
+vim_configs := $(strip \
+  --enable-fail-if-missing \
+  --disable-smack \
+  --disable-selinux \
+  --disable-xsmp \
+  --disable-xsmp-interact \
+  --enable-luainterp=dynamic \
+  --enable-python3interp=dynamic \
+  --enable-cscope \
+  --disable-netbeans \
+  --enable-terminal \
+  --enable-multibyte \
+  --disable-rightleft \
+  --disable-arabic \
+  --enable-gui=no \
+  --with-compiledby=sasa+1 \
+  --with-features=huge \
+  --with-luajit \
+  --without-x \
+  --with-tlib=ncurses \
+)
 
 .PHONY: all
 all: ## output targets
@@ -26,6 +48,6 @@ download-vim: ## download Vim archive
 .PHONY: install-vim
 install-vim: ## install Vim
 	tar fvx '$(root)/usr/src/v$(vim_version).tar.gz' -C '$(root)/usr/src/'
-	cd '$(root)/usr/src/vim-$(vim_version)' && ./configure --prefix='$(prefix)'
+	cd '$(root)/usr/src/vim-$(vim_version)' && ./configure --prefix='$(prefix)' $(vim_configs)
 	make -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
