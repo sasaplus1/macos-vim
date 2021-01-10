@@ -78,6 +78,6 @@ install-luajit: ## install LuaJIT
 install-vim: ## install Vim
 	$(RM) -r '$(root)/usr/src/vim-$(vim_version)'
 	tar fvx '$(root)/usr/src/v$(vim_version).tar.gz' -C '$(root)/usr/src/'
-	cd '$(root)/usr/src/vim-$(vim_version)' && ./configure --prefix='$(prefix)' $(vim_configs)
+	cd '$(root)/usr/src/vim-$(vim_version)' && LDFLAGS='-L$(prefix)/bin -L$(prefix)/lib' ./configure --prefix='$(prefix)' $(vim_configs)
 	make -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
