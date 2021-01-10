@@ -9,6 +9,9 @@
 /usr/lib/**
 !/usr/lib/.gitkeep
 
+/usr/man/**
+!/usr/man/.gitkeep
+
 /usr/share/**
 !/usr/share/.gitkeep
 
