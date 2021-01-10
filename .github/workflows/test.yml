@@ -17,5 +17,5 @@ jobs:
       - run: make install-luajit
       - run: make download-vim
       - run: make install-vim
-      - run: ./usr/bin/vim --version
       - run: otool -L ./usr/bin/vim
+      - run: ./usr/bin/vim --version
