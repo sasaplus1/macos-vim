@@ -61,6 +61,7 @@ install-luajit: ## install LuaJIT
 	tar fvx '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' -C '$(root)/usr/src'
 	MACOSX_DEPLOYMENT_TARGET=10.14 make -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
+	cd '$(root)/usr/include' && ln -s lua luajit-*
 
 .PHONY: install-vim
 install-vim: ## install Vim
