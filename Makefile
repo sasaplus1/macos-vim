@@ -81,3 +81,4 @@ install-vim: ## install Vim
 	cd '$(root)/usr/src/vim-$(vim_version)' && LDFLAGS='-L$(prefix)/lib' PATH='$(prefix)/bin':$$PATH ./configure --prefix='$(prefix)' $(vim_configs)
 	make -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
+	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libluajit/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libluajit-?.?.?.dylib)" '$(prefix)/bin/vim'
