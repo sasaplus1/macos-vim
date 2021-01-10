@@ -9,6 +9,7 @@ root := $(makefile_dir)
 
 prefix := $(abspath $(root)/usr)
 
+lua_version := 5.4.2
 luajit_version := 2.0.5
 
 vim_version := 8.2.2311
@@ -40,7 +41,11 @@ all: ## output targets
 
 .PHONY: clean
 clean: ## remove files
-	$(RM) $(root)/usr/bin/* $(root)/usr/lib/* $(root)/usr/share/* $(root)/usr/src/*
+	$(RM) -r $(root)/usr/bin/* $(root)/usr/include/* $(root)/usr/lib/* $(root)/usr/man/* $(root)/usr/share/* $(root)/usr/src/*
+
+.PHONY: download-lua
+download-lua: ## download Lua archive
+	curl -L -o '$(root)/usr/src/lua-$(lua_version).tar.gz' https://www.lua.org/ftp/lua-$(lua_version).tar.gz
 
 .PHONY: download-luajit
 download-luajit: ## download LuaJIT archive
@@ -51,9 +56,16 @@ download-vim: ## download Vim archive
 	curl -L -o '$(root)/usr/src/v$(vim_version).tar.gz' https://github.com/vim/vim/archive/v$(vim_version).tar.gz
 
 .PHONY: install
-install: ## install Vim and LuaJIT
+install: ## install Vim and some additinal components
+install: download-lua install-lua
 install: download-luajit install-luajit
 install: download-vim install-vim
+
+.PHONY: install-lua
+install-lua: ## install Lua
+	$(RM) -r '$(root)/usr/src/lua-$(lua_version)'
+	tar fvx '$(root)/usr/src/lua-$(lua_version).tar.gz' -C '$(root)/usr/src'
+	make all install INSTALL_TOP='$(prefix)' -C '$(root)/usr/src/lua-$(lua_version)'
 
 .PHONY: install-luajit
 install-luajit: ## install LuaJIT
@@ -61,7 +73,6 @@ install-luajit: ## install LuaJIT
 	tar fvx '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' -C '$(root)/usr/src'
 	MACOSX_DEPLOYMENT_TARGET=10.14 make -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
-	cd '$(root)/usr/include' && ln -s lua luajit-*
 
 .PHONY: install-vim
 install-vim: ## install Vim
