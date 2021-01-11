@@ -7,8 +7,7 @@ my KaoriYa Vim for macOS
 ## How to build
 
 ```console
-$ make download-vim
-$ make install-vim
+$ make install
 ```
 
 see `Makefile` for more details.
