@@ -9,6 +9,25 @@ root := $(makefile_dir)
 
 prefix := $(abspath $(root)/usr)
 
+gettext_version := 0.21
+gettext_configs := $(strip \
+   --enable-option-checking \
+   --disable-dependency-tracking \
+   --disable-java \
+   --disable-csharp \
+   --disable-largefile \
+   --enable-fast-install \
+   --disable-c++ \
+   --enable-cross-guesses \
+   --enable-relocatable \
+   --without-emacs \
+   --without-lispdir \
+   --without-git \
+   --without-cvs \
+   --without-bzip2 \
+   --without-xz \
+)
+
 lua_version := 5.4.2
 luajit_version := 2.0.5
 
@@ -43,6 +62,10 @@ all: ## output targets
 clean: ## remove files
 	$(RM) -r $(root)/usr/bin/* $(root)/usr/include/* $(root)/usr/lib/* $(root)/usr/man/* $(root)/usr/share/* $(root)/usr/src/*
 
+.PHONY: download-gettext
+download-gettext: ## download gettext archive
+	curl -L -o '$(root)/usr/src/gettext-$(gettext_version).tar.xz' https://ftp.gnu.org/pub/gnu/gettext/gettext-$(gettext_version).tar.xz
+
 .PHONY: download-lua
 download-lua: ## download Lua archive
 	curl -L -o '$(root)/usr/src/lua-$(lua_version).tar.gz' https://www.lua.org/ftp/lua-$(lua_version).tar.gz
@@ -57,9 +80,18 @@ download-vim: ## download Vim archive
 
 .PHONY: install
 install: ## install Vim and some additinal components
+install: download-gettext install-gettext
 install: download-lua install-lua
 install: download-luajit install-luajit
 install: download-vim install-vim
+
+.PHONY: install-gettext
+install-gettext: ## install gettext
+	$(RM) -r '$(root)/usr/src/gettext-$(gettext_version)'
+	tar fvx '$(root)/usr/src/gettext-$(gettext_version).tar.xz' -C '$(root)/usr/src'
+	cd '$(root)/usr/src/gettext-$(gettext_version)' && ./configure --prefix='$(prefix)' $(gettext_configs)
+	make -C '$(root)/usr/src/gettext-$(gettext_version)'
+	make install -C '$(root)/usr/src/gettext-$(gettext_version)'
 
 .PHONY: install-lua
 install-lua: ## install Lua
@@ -78,7 +110,8 @@ install-luajit: ## install LuaJIT
 install-vim: ## install Vim
 	$(RM) -r '$(root)/usr/src/vim-$(vim_version)'
 	tar fvx '$(root)/usr/src/v$(vim_version).tar.gz' -C '$(root)/usr/src/'
-	cd '$(root)/usr/src/vim-$(vim_version)' && LDFLAGS='-L$(prefix)/lib' PATH='$(prefix)/bin':$$PATH ./configure --prefix='$(prefix)' $(vim_configs)
+	cd '$(root)/usr/src/vim-$(vim_version)' && CFLAGS='-I$(prefix)/include' LDFLAGS='-L$(prefix)/lib' PATH='$(prefix)/bin':$$PATH ./configure --prefix='$(prefix)' $(vim_configs)
 	make -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
+	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libintl/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libintl.?.dylib)" '$(prefix)/bin/vim'
 	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libluajit/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libluajit-?.?.?.dylib)" '$(prefix)/bin/vim'
