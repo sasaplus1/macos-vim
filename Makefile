@@ -78,12 +78,19 @@ download-luajit: ## download LuaJIT archive
 download-vim: ## download Vim archive
 	curl -L -o '$(root)/usr/src/v$(vim_version).tar.gz' https://github.com/vim/vim/archive/v$(vim_version).tar.gz
 
-.PHONY: install
-install: ## install Vim and some additinal components
-install: download-gettext install-gettext
-install: download-lua install-lua
-install: download-luajit install-luajit
-install: download-vim install-vim
+.PHONY: install-default-vim
+install-default-vim: ## install Vim and some additinal components
+install-default-vim: download-gettext install-gettext
+install-default-vim: download-lua install-lua
+install-default-vim: download-luajit install-luajit
+install-default-vim: download-vim install-vim
+
+.PHONY: install-kaoriya-vim
+install-kaoriya-vim: ## install KaoriYa Vim and some additional components
+install-kaoriya-vim: download-gettext install-gettext
+install-kaoriya-vim: download-lua install-lua
+install-kaoriya-vim: download-luajit install-luajit
+install-kaoriya-vim: install-vim-kaoriya
 
 .PHONY: install-gettext
 install-gettext: ## install gettext
@@ -113,5 +120,29 @@ install-vim: ## install Vim
 	cd '$(root)/usr/src/vim-$(vim_version)' && CFLAGS='-I$(prefix)/include' LDFLAGS='-L$(prefix)/lib' PATH='$(prefix)/bin':$$PATH ./configure --prefix='$(prefix)' $(vim_configs)
 	make -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
+	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libintl/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libintl.?.dylib)" '$(prefix)/bin/vim'
+	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libluajit/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libluajit-?.?.?.dylib)" '$(prefix)/bin/vim'
+
+.PHONY: install-vim-kaoriya
+install-vim-kaoriya: ## install KaoriYa Vim
+	git clone --depth 1 https://github.com/koron/guilt.git '$(root)/usr/src/guilt'
+	git clone --depth 1 https://github.com/koron/vim-kaoriya.git '$(root)/usr/src/vim-kaoriya'
+	git clone --depth 1 https://github.com/ko1nksm/readlinkf '$(root)/usr/src/readlinkf'
+	cd '$(root)/usr/src/vim-kaoriya' && git submodule update --depth 1 --init --recommend-shallow --recursive -- ./contrib/vimdoc-ja ./patches ./vim
+	awk '$$1 ~ /^VIM_VER$$/ { print $$3 }' '$(root)/usr/src/vim-kaoriya/VERSION' > '$(root)/usr/src/vim-kaoriya/VIM_VER'
+	sed -i.bak -e 's|readlink -f|"$(root)/usr/src/readlinkf/readlinkf_posix"|g' '$(root)/usr/src/guilt/guilt'
+	make install PREFIX='$(root)/usr' -C '$(root)/usr/src/guilt'
+	cd '$(root)/usr/src/vim-kaoriya/vim' && git checkout -b v$$(cat '$(root)/usr/src/vim-kaoriya/VIM_VER')
+	cd '$(root)/usr/src/vim-kaoriya/vim' && git config --local guilt.patchesdir ../patches
+	cd '$(root)/usr/src/vim-kaoriya/vim' && PATH='$(root)/usr/bin':$$PATH guilt init
+	cd '$(root)/usr/src/vim-kaoriya' && cp ./patches/master/* "./patches/v$$(cat '$(root)/usr/src/vim-kaoriya/VIM_VER')"
+	cd '$(root)/usr/src/vim-kaoriya/vim/src' && PATH='$(root)/usr/bin':$$PATH guilt push --all
+	make autoconf -C '$(root)/usr/src/vim-kaoriya/vim/src'
+	cd '$(root)/usr/src/vim-kaoriya/vim' && CFLAGS='-I$(prefix)/include' LDFLAGS='-L$(prefix)/lib' PATH='$(prefix)/bin':$$PATH ./configure --prefix='$(prefix)' $(vim_configs)
+	make -C '$(root)/usr/src/vim-kaoriya/vim'
+	make install -C '$(root)/usr/src/vim-kaoriya/vim'
+	sed -i.bak -e "s|-o \{1,\}root|-o $$(whoami)|g" '$(root)/usr/src/vim-kaoriya/build/freebsd/Makefile'
+	make kaoriya-install -C '$(root)/usr/src/vim-kaoriya/build/freebsd'
+	cp -rf '$(root)/usr/src/vim-kaoriya/contrib/vimdoc-ja' '$(root)/usr/share/vim/plugins'
 	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libintl/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libintl.?.dylib)" '$(prefix)/bin/vim'
 	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libluajit/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libluajit-?.?.?.dylib)" '$(prefix)/bin/vim'
