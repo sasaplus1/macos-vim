@@ -5,8 +5,8 @@ on:
   - pull_request
 
 jobs:
-  build:
-    name: build
+  build-default-vim:
+    name: build default Vim
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,7 +23,31 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: config.log
-          path: config.log
+          path: default-config.log
+      - run: otool -L ./usr/bin/vim
+      - run: ./usr/bin/vim --version
+      - name: output Lua version
+        run: ./usr/bin/vim --clean --cmd 'lua print(_VERSION)' --cmd 'qall!'
+      - name: output LuaJIT version
+        run: ./usr/bin/vim --clean --cmd 'lua print(jit.version)' --cmd 'qall!'
+  build-kaoriya-vim:
+    name: build KaoriYa Vim
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make
+      - run: make download-gettext
+      - run: make install-gettext
+      - run: make download-lua
+      - run: make install-lua
+      - run: make download-luajit
+      - run: make install-luajit
+      - run: make install-kaoriya-vim
+      - run: cp usr/src/vim-kaoriya/vim/src/auto/config.log config.log
+      - uses: actions/upload-artifact@v2
+        with:
+          name: config.log
+          path: kaoriya-config.log
       - run: otool -L ./usr/bin/vim
       - run: ./usr/bin/vim --version
       - name: output Lua version
