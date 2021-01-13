@@ -11,6 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: make
+      - run: make download-gettext
+      - run: make install-gettext
       - run: make download-lua
       - run: make install-lua
       - run: make download-luajit
