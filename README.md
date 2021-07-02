@@ -10,6 +10,12 @@ my Vim for macOS
 $ make install
 ```
 
+if you want change install directory:
+
+```console
+$ make install prefix=/path/to/dir
+```
+
 see `Makefile` for more details.
 
 ## License

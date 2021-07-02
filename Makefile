@@ -7,7 +7,7 @@ makefile_dir := $(dir $(makefile))
 
 root := $(makefile_dir)
 
-prefix := $(abspath $(root)/usr)
+prefix ?= $(abspath $(root)/usr)
 
 gettext_version := 0.21
 gettext_configs := $(strip \
