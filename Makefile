@@ -29,7 +29,6 @@ gettext_configs := $(strip \
 )
 
 lua_version := 5.4.3
-luajit_version := 2.0.5
 
 vim_version := 8.2.3082
 vim_configs := $(strip \
@@ -49,7 +48,6 @@ vim_configs := $(strip \
   --with-compiledby=sasa+1 \
   --with-features=huge \
   --with-lua-prefix='$(prefix)' \
-  --with-luajit \
   --without-x \
   --with-tlib=ncurses \
 )
@@ -66,7 +64,6 @@ clean: ## remove files
 install: ## install Vim and some additinal components
 install: download-gettext install-gettext
 install: download-lua install-lua
-install: download-luajit install-luajit
 install: download-vim install-vim
 
 .PHONY: download-gettext
@@ -76,10 +73,6 @@ download-gettext: ## [subtarget] download gettext archive
 .PHONY: download-lua
 download-lua: ## [subtarget] download Lua archive
 	curl -L -o '$(root)/usr/src/lua-$(lua_version).tar.gz' https://www.lua.org/ftp/lua-$(lua_version).tar.gz
-
-.PHONY: download-luajit
-download-luajit: ## [subtarget] download LuaJIT archive
-	curl -L -o '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' https://luajit.org/download/LuaJIT-$(luajit_version).tar.gz
 
 .PHONY: download-vim
 download-vim: ## [subtarget] download Vim archive
@@ -99,13 +92,6 @@ install-lua: ## [subtarget] install Lua
 	tar fvx '$(root)/usr/src/lua-$(lua_version).tar.gz' -C '$(root)/usr/src'
 	make all install INSTALL_TOP='$(prefix)' -C '$(root)/usr/src/lua-$(lua_version)'
 
-.PHONY: install-luajit
-install-luajit: ## [subtarget] install LuaJIT
-	$(RM) -r '$(root)/usr/src/LuaJIT-$(luajit_version)'
-	tar fvx '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' -C '$(root)/usr/src'
-	MACOSX_DEPLOYMENT_TARGET=10.14 make -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
-	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
-
 .PHONY: install-vim
 install-vim: ## [subtarget] install Vim
 	$(RM) -r '$(root)/usr/src/vim-$(vim_version)'
@@ -114,4 +100,3 @@ install-vim: ## [subtarget] install Vim
 	make -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
 	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libintl/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libintl.?.dylib)" '$(prefix)/bin/vim'
-	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libluajit/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libluajit-?.?.?.dylib)" '$(prefix)/bin/vim'
