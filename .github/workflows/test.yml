@@ -1,8 +1,14 @@
 name: test
 
 on:
-  - push
-  - pull_request
+  push:
+    paths:
+      - 'Makefile'
+      - 'usr/**'
+  pull_request:
+    paths:
+      - 'Makefile'
+      - 'usr/**'
 
 jobs:
   build:
