@@ -7,6 +7,8 @@ makefile_dir := $(dir $(makefile))
 
 root := $(makefile_dir)
 
+arch := $(shell uname -m)
+
 prefix ?= $(abspath $(root)/usr)
 
 gettext_version := 0.21
@@ -49,10 +51,13 @@ vim_configs := $(strip \
   --with-compiledby=sasa+1 \
   --with-features=huge \
   --with-lua-prefix='$(prefix)' \
-  --with-luajit \
   --without-x \
   --with-tlib=ncurses \
 )
+
+ifneq ($(arch),arm64)
+  vim_configs += --with-luajit
+endif
 
 .PHONY: all
 all: ## output targets
@@ -66,7 +71,9 @@ clean: ## remove files
 install: ## install Vim and some additinal components
 install: download-gettext install-gettext
 install: download-lua install-lua
+ifneq ($(arch),arm64)
 install: download-luajit install-luajit
+endif
 install: download-vim install-vim
 
 .PHONY: download-gettext
@@ -114,4 +121,6 @@ install-vim: ## [subtarget] install Vim
 	make -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
 	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libintl/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libintl.?.dylib)" '$(prefix)/bin/vim'
+ifneq ($(arch),arm64)
 	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libluajit/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libluajit-?.?.?.dylib)" '$(prefix)/bin/vim'
+endif
