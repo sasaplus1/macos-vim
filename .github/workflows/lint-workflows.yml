@@ -1,0 +1,18 @@
+name: lint workflows
+
+on:
+  push:
+    paths:
+      - '.github/workflows/*'
+  pull_request:
+    paths:
+      - '.github/workflows/*'
+
+jobs:
+  lint-workflow-files:
+    name: lint workflow files
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker://rhysd/actionlint:1.6.12
