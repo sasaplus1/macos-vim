@@ -34,7 +34,7 @@ jobs:
       - run: otool -L ./usr/bin/vim
       - run: ./usr/bin/vim --version
       - name: has +gettext
-        run: ./usr/bin/vim --version | grep '+gettext' >/dev/null
+        run: ./usr/bin/vim --version | grep -o '+gettext'
       - name: output Lua version
         run: ./usr/bin/vim --clean --cmd 'lua print(_VERSION)' --cmd 'qall!'
       - name: output LuaJIT version
