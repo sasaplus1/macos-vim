@@ -12,14 +12,32 @@ arch := $(shell uname -m)
 prefix ?= $(abspath $(root)/usr)
 
 gettext_version := 0.21
-gettext_configs := $(strip \
+gettext_runtime_configs := $(strip \
    --enable-option-checking \
    --disable-dependency-tracking \
    --disable-java \
    --disable-csharp \
    --disable-largefile \
    --enable-fast-install \
+   --disable-libtool-lock \
+   --disable-nls \
+   --disable-rpath \
    --disable-c++ \
+   --enable-cross-guesses \
+   --enable-relocatable \
+   --disable-libasprintf \
+)
+gettext_tools_configs := $(strip \
+   --enable-option-checking \
+   --disable-dependency-tracking \
+   --disable-java \
+   --disable-csharp \
+   --disable-largefile \
+   --enable-fast-install \
+   --disable-nls \
+   --disable-rpath \
+   --disable-c++ \
+   --disable-openmp \
    --enable-cross-guesses \
    --enable-relocatable \
    --without-emacs \
@@ -96,9 +114,12 @@ download-vim: ## [subtarget] download Vim archive
 install-gettext: ## [subtarget] install gettext
 	$(RM) -r '$(root)/usr/src/gettext-$(gettext_version)'
 	tar fvx '$(root)/usr/src/gettext-$(gettext_version).tar.xz' -C '$(root)/usr/src'
-	cd '$(root)/usr/src/gettext-$(gettext_version)' && ./configure --prefix='$(prefix)' $(gettext_configs)
-	make -C '$(root)/usr/src/gettext-$(gettext_version)'
-	make install -C '$(root)/usr/src/gettext-$(gettext_version)'
+	cd '$(root)/usr/src/gettext-$(gettext_version)/gettext-runtime' && ./configure --prefix='$(prefix)' $(gettext_runtime_configs)
+	make -C '$(root)/usr/src/gettext-$(gettext_version)/gettext-runtime'
+	make install -C '$(root)/usr/src/gettext-$(gettext_version)/gettext-runtime'
+	cd '$(root)/usr/src/gettext-$(gettext_version)/gettext-tools' && ./configure --prefix='$(prefix)' $(gettext_tools_configs)
+	make -C '$(root)/usr/src/gettext-$(gettext_version)/gettext-tools'
+	make install -C '$(root)/usr/src/gettext-$(gettext_version)/gettext-tools'
 
 .PHONY: install-lua
 install-lua: ## [subtarget] install Lua
