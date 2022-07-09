@@ -38,6 +38,6 @@ jobs:
       - name: has +gettext
         run: ./usr/bin/vim --version | grep -o '+gettext'
       - name: output Lua version
-        run: ./usr/bin/vim --clean --cmd 'lua print(_VERSION)' --cmd 'qall!'
+        run: ./usr/bin/vim --not-a-term --clean --cmd 'lua print(_VERSION)' --cmd 'qall!'
       - name: output LuaJIT version
-        run: ./usr/bin/vim --clean --cmd 'lua print(jit.version)' --cmd 'qall!'
+        run: ./usr/bin/vim --not-a-term --clean --cmd 'lua print(jit.version)' --cmd 'qall!'
