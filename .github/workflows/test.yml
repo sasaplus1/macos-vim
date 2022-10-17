@@ -16,7 +16,7 @@ jobs:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: hendrikmuhs/ccache-action@v1.2
       - run: echo "PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH" >> "$GITHUB_ENV"
       - run: make
@@ -29,7 +29,7 @@ jobs:
       - run: make download-vim
       - run: make install-vim
       - run: cp usr/src/vim-*/src/auto/config.log config.log
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: config.log
           path: config.log
