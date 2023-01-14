@@ -1,0 +1,43 @@
+name: update
+
+on:
+  schedule:
+    # at 12:05 on Wednesday, JST
+    - cron: '5 3 * * 3'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-request: write
+
+jobs:
+  update:
+    name: update
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: >
+          curl https://api.github.com/repos/vim/vim/tags |
+          jq -r '.[0].name' |
+          sed -e 's/^v//' |
+          tee latest.txt
+      - run: sed -i.bak "s/vim_version := .*/vim_version := $(cat latest.txt)/" Makefile
+      - run: rm -f Makefile.bak
+      - run: |
+          if git diff --exit-code --quiet
+          then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+        id: diff
+      - uses: peter-evans/create-pull-request@v4
+        with:
+          author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          body: ''
+          branch: update
+          commit-message: update vim version
+          delete-branch: true
+          reviewers: sasaplus1
+          title: update vim version
+        if: steps.diff.outputs.changed
