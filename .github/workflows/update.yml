@@ -22,7 +22,7 @@ jobs:
           sed -e 's/^v//' |
           tee latest.txt
       - run: sed -i.bak "s/vim_version := .*/vim_version := $(cat latest.txt)/" Makefile
-      - run: rm -f Makefile.bak
+      - run: rm -f latest.txt Makefile.bak
       - run: |
           if git diff --exit-code --quiet
           then
