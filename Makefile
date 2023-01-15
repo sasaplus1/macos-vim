@@ -8,6 +8,7 @@ makefile_dir := $(dir $(makefile))
 root := $(makefile_dir)
 
 arch := $(shell uname -m)
+nproc := $(shell getconf _NPROCESSORS_ONLN)
 
 prefix ?= $(abspath $(root)/usr)
 
@@ -97,7 +98,7 @@ install-gettext: ## [subtarget] install gettext
 	$(RM) -r '$(root)/usr/src/gettext-$(gettext_version)'
 	tar fvx '$(root)/usr/src/gettext-$(gettext_version).tar.xz' -C '$(root)/usr/src'
 	cd '$(root)/usr/src/gettext-$(gettext_version)' && ./configure --prefix='$(prefix)' $(gettext_configs)
-	make -C '$(root)/usr/src/gettext-$(gettext_version)'
+	make -j$(nproc) -C '$(root)/usr/src/gettext-$(gettext_version)'
 	make install -C '$(root)/usr/src/gettext-$(gettext_version)'
 
 .PHONY: install-lua
@@ -118,7 +119,7 @@ install-vim: ## [subtarget] install Vim
 	$(RM) -r '$(root)/usr/src/vim-$(vim_version)'
 	tar fvx '$(root)/usr/src/v$(vim_version).tar.gz' -C '$(root)/usr/src/'
 	cd '$(root)/usr/src/vim-$(vim_version)' && CFLAGS='-I$(prefix)/include' LDFLAGS='-L$(prefix)/lib' PATH='$(prefix)/bin':$$PATH ./configure --prefix='$(prefix)' $(vim_configs)
-	make -C '$(root)/usr/src/vim-$(vim_version)'
+	make -j$(nproc) -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
 	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libintl/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libintl.?.dylib)" '$(prefix)/bin/vim'
 ifneq ($(arch),arm64)
