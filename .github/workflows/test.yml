@@ -10,6 +10,9 @@ on:
       - 'Makefile'
       - 'usr/**'
 
+env:
+  LDFLAGS: -fuse-ld=lld
+
 jobs:
   build:
     name: build
@@ -19,6 +22,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: hendrikmuhs/ccache-action@v1.2
       - run: echo "PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH" >> "$GITHUB_ENV"
+      - run: brew install llvm
       - run: make
       - run: make download-gettext
       - run: make install-gettext
