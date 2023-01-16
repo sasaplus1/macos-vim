@@ -4,11 +4,11 @@ on:
   push:
     paths:
       - 'Makefile'
-      - 'usr/**'
+      - 'usr/**/*'
   pull_request:
     paths:
       - 'Makefile'
-      - 'usr/**'
+      - 'usr/**/*'
 
 jobs:
   build:
