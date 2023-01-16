@@ -13,11 +13,11 @@ permissions:
 jobs:
   update:
     name: update
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: >
-          curl https://api.github.com/repos/vim/vim/tags |
+          curl -fsSL https://api.github.com/repos/vim/vim/tags |
           jq -r '.[0].name' |
           sed -e 's/^v//' |
           tee latest.txt
