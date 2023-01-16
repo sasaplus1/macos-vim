@@ -10,6 +10,11 @@ on:
       - 'Makefile'
       - 'usr/**/*'
 
+env:
+  CFLAGS: -I/usr/local/opt/llvm/include
+  CPPFLAGS: -I/usr/local/opt/llvm/include
+  LDFLAGS: -L/usr/local/opt/llvm/lib -fuse-ld=lld
+
 jobs:
   build:
     name: build
@@ -17,6 +22,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
+      - run: brew install llvm
+      - run: echo "PATH=/usr/local/opt/llvm/bin:$PATH" >> "$GITHUB_ENV"
+      - run: type lld
       - uses: hendrikmuhs/ccache-action@v1.2
       - run: echo "PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH" >> "$GITHUB_ENV"
       - run: make
