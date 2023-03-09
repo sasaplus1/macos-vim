@@ -12,6 +12,11 @@ nproc := $(shell getconf _NPROCESSORS_ONLN)
 
 prefix ?= $(abspath $(root)/usr)
 
+configure_configs := $(strip \
+   -C \
+   --prefix='$(prefix)' \
+)
+
 gettext_version := 0.21
 gettext_configs := $(strip \
    --enable-option-checking \
@@ -97,7 +102,7 @@ download-vim: ## [subtarget] download Vim archive
 install-gettext: ## [subtarget] install gettext
 	$(RM) -r '$(root)/usr/src/gettext-$(gettext_version)'
 	tar fvx '$(root)/usr/src/gettext-$(gettext_version).tar.xz' -C '$(root)/usr/src'
-	cd '$(root)/usr/src/gettext-$(gettext_version)' && ./configure --prefix='$(prefix)' $(gettext_configs)
+	cd '$(root)/usr/src/gettext-$(gettext_version)' && ./configure $(configure_configs) $(gettext_configs)
 	make -j$(nproc) -C '$(root)/usr/src/gettext-$(gettext_version)'
 	make install -C '$(root)/usr/src/gettext-$(gettext_version)'
 
@@ -118,7 +123,7 @@ install-luajit: ## [subtarget] install LuaJIT
 install-vim: ## [subtarget] install Vim
 	$(RM) -r '$(root)/usr/src/vim-$(vim_version)'
 	tar fvx '$(root)/usr/src/v$(vim_version).tar.gz' -C '$(root)/usr/src/'
-	cd '$(root)/usr/src/vim-$(vim_version)' && CFLAGS='-I$(prefix)/include' LDFLAGS='-L$(prefix)/lib' PATH='$(prefix)/bin':$$PATH ./configure --prefix='$(prefix)' $(vim_configs)
+	cd '$(root)/usr/src/vim-$(vim_version)' && CFLAGS='-I$(prefix)/include' LDFLAGS='-L$(prefix)/lib' PATH='$(prefix)/bin':$$PATH ./configure $(configure_configs) $(vim_configs)
 	make -j$(nproc) -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
 	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libintl/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libintl.?.dylib)" '$(prefix)/bin/vim'
