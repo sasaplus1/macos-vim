@@ -37,7 +37,8 @@ jobs:
             find ./usr/bin -maxdepth 1 -perm -111 -type f -print0 |
               while IFS= read -r -d '' file
               do
-                local -r replacements="$(mktemp)"
+                local replacements
+                replacements="$(mktemp)"
 
                 otool -L "$file" |
                   awk '/macos-vim/ { print $1 }' |
