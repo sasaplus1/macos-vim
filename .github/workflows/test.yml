@@ -42,7 +42,7 @@ jobs:
 
                 otool -L "$file" |
                   awk '/macos-vim/ { print $1 }' |
-                  awk -F '/' -v 'OFS=' '{ print $0, " ", "@rpath/", $(NF) }' |
+                  awk -F '/' -v 'OFS=' '{ print $0, " ", "@executable_path/../", $(NF - 1), "/", $(NF) }' |
                   tee "$replacements"
 
                 while read -r old new
