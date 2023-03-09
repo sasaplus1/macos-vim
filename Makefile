@@ -66,7 +66,7 @@ ifneq ($(arch),arm64)
 endif
 
 .PHONY: all
-all: ## output targets
+all: ## output executables
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(makefile) | awk 'BEGIN { FS = ":.*?## " }; { printf "\033[36m%-30s\033[0m %s\n", $$1, $$2 }'
 
 .PHONY: clean
@@ -80,7 +80,7 @@ install: download-lua install-lua
 ifneq ($(arch),arm64)
 install: download-luajit install-luajit
 endif
-install: download-vim install-vim
+install: download-vim install-vim rewrite-dylib-paths
 
 .PHONY: download-gettext
 download-gettext: ## [subtarget] download gettext archive
@@ -126,7 +126,39 @@ install-vim: ## [subtarget] install Vim
 	cd '$(root)/usr/src/vim-$(vim_version)' && CFLAGS='-I$(prefix)/include' LDFLAGS='-L$(prefix)/lib' PATH='$(prefix)/bin':$$PATH ./configure $(configure_configs) $(vim_configs)
 	make -j$(nproc) -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
-	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libintl/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libintl.?.dylib)" '$(prefix)/bin/vim'
-ifneq ($(arch),arm64)
-	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libluajit/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libluajit-?.?.?.dylib)" '$(prefix)/bin/vim'
-endif
+
+define __script
+  __main() {
+    unset -f __main
+
+    local executables
+    executables="$(mktemp)"
+
+    find '$(root)/usr/hogehoge_bin' -maxdepth 1 -perm -111 -type f -print0 > "$executables"
+
+    while IFS= read -r -d '' file
+    do
+      local pairs
+      pairs="$(mktemp)"
+
+      otool -L "$file" | \
+        awk '/$(root)/ { print $1 }' | \
+        awk -F '/' -v 'OFS=' '{ print $0, " ", "@executable_path/../", $(NF - 1), "/", $(NF) }' > "$pairs"
+
+      while read -r old new
+      do
+        install_name_tool -change "$old" "$new" "$file"
+      done < "$pairs"
+    done < "$executables"
+  }
+  __main "$@"
+endef
+export __script
+
+.PHONY: rewrite-dylib-paths
+rewrite-dylib-paths: ## [subtarget] rewrite dylib paths
+	otool -L '$(root)/usr/bin/'* | awk '/$(subst /,\/,$(root))/ { print $$1 }' | sort -u
+#	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libintl/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libintl.?.dylib)" '$(prefix)/bin/vim'
+#ifneq ($(arch),arm64)
+#	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libluajit/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libluajit-?.?.?.dylib)" '$(prefix)/bin/vim'
+#endif
