@@ -27,7 +27,8 @@ jobs:
         with:
           name: config.log
           path: config.log
-      - run: otool -L ./usr/bin/vim
+      - name: print dylib paths
+        run: find ./usr/bin -maxdepth 1 -perm -111 -type f -print0 | xargs -0 otool -L
       - run: ./usr/bin/vim --version
       - name: has +gettext
         run: ./usr/bin/vim --version | grep -o '+gettext'
@@ -35,3 +36,26 @@ jobs:
         run: ./usr/bin/vim --not-a-term --clean --cmd 'lua print(_VERSION)' --cmd 'qall!'
       - name: output LuaJIT version
         run: ./usr/bin/vim --not-a-term --clean --cmd 'lua print(jit.version)' --cmd 'qall!'
+      - name: rewrite dylib paths
+        run: |
+          __main() {
+            unset -f __main
+
+            for file in $(find ./usr/bin -maxdepth 1 -perm -111 -type f -print)
+            do
+              local replacements="$(mktemp)"
+
+              otool -L "$file" |
+                awk '/macos-vim/ { print $1 }' |
+                awk -F '/' -v 'OFS=' '{ print $0, " ", "@executable_path/../", $(NF - 1), "/", $(NF) }' |
+                tee "$replacements"
+
+              while read -r old new
+              do
+                install_name_tool -change "$old" "$new" "$file"
+              done < "$replacements"
+            done
+          }
+          __main
+      - name: print dylib paths
+        run: find ./usr/bin -maxdepth 1 -perm -111 -type f -print0 | xargs -0 otool -L
