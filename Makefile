@@ -134,4 +134,4 @@ postinstall-vim: awk_find := /macos-vim.*\.dylib/ || /libluajit-.*\.dylib/ { pri
 postinstall-vim: awk_args := BEGIN { FS = "/"; OFS = "" } { print $$0, " ", "@executable_path/../", $$(NF-1), "/", $$(NF) }
 postinstall-vim: ## [subtarget] rewrite dylib paths
 	echo '$(exe_file)' | xargs otool -L | awk '$(awk_find)' | sort -u | awk '$(awk_args)' > '$(arg_file)'
-	$(foreach file,$(exe_file),read old new < '$(arg_file)' && install_name_tool -change "$$old" "$$new" '$(file)';)
+	$(foreach file,$(exe_file),while read -r old new; do install_name_tool -change "$$old" "$$new" '$(file)'; done < '$(arg_file)';)
