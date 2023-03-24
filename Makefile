@@ -80,7 +80,7 @@ install: download-lua install-lua
 ifneq ($(arch),arm64)
 install: download-luajit install-luajit
 endif
-install: download-vim install-vim
+install: download-vim install-vim postinstall-vim
 
 .PHONY: download-gettext
 download-gettext: ## [subtarget] download gettext archive
@@ -126,7 +126,12 @@ install-vim: ## [subtarget] install Vim
 	cd '$(root)/usr/src/vim-$(vim_version)' && CFLAGS='-I$(prefix)/include' LDFLAGS='-L$(prefix)/lib' PATH='$(prefix)/bin':$$PATH ./configure $(configure_configs) $(vim_configs)
 	make -j$(nproc) -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
-	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libintl/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libintl.?.dylib)" '$(prefix)/bin/vim'
-ifneq ($(arch),arm64)
-	install_name_tool -change "$$(otool -L '$(prefix)/bin/vim' | awk '/libluajit/ { print $$1 }')" "$$(ls -1 '$(prefix)'/lib/libluajit-?.?.?.dylib)" '$(prefix)/bin/vim'
-endif
+
+.PHONY: postinstall-vim
+postinstall-vim: exe_file := $(shell find '$(abspath $(prefix)/bin)' -type f -perm -111 -print)
+postinstall-vim: arg_file := $(shell mktemp)
+postinstall-vim: awk_find := /macos-vim.*\.dylib/ || /libluajit-.*\.dylib/ { print $$1 }
+postinstall-vim: awk_args := BEGIN { FS = "/"; OFS = "" } { print $$0, " ", "@executable_path/../", $$(NF-1), "/", $$(NF) }
+postinstall-vim: ## [subtarget] rewrite dylib paths
+	echo '$(exe_file)' | xargs otool -L | awk '$(awk_find)' | sort -u | awk '$(awk_args)' > '$(arg_file)'
+	$(foreach file,$(exe_file),while read -r old new; do install_name_tool -change "$$old" "$$new" '$(file)'; done < '$(arg_file)';)
