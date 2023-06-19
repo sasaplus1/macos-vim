@@ -120,9 +120,9 @@ install-luajit: ## [subtarget] install LuaJIT
 	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 
 .PHONY: install-vim
-install-vim: ## [subtarget] install Vim
 install-vim: CFLAGS := -I$(prefix)/include
 install-vim: LDFLAGS := -L$(prefix)/lib -Wl,-rpath,'@executable_path/../lib'
+install-vim: ## [subtarget] install Vim
 	$(RM) -r '$(root)/usr/src/vim-$(vim_version)'
 	tar fvx '$(root)/usr/src/v$(vim_version).tar.gz' -C '$(root)/usr/src/'
 	cd '$(root)/usr/src/vim-$(vim_version)' && CFLAGS='$(CFLAGS)' LDFLAGS="$(LDFLAGS)" PATH='$(prefix)/bin':$$PATH ./configure $(configure_configs) $(vim_configs)
