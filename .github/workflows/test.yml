@@ -28,8 +28,10 @@ jobs:
           name: config.log
           path: config.log
       - run: lipo -archs ./usr/bin/vim
+      - run: otool -l ./usr/bin/vim
       - run: otool -L ./usr/bin/vim
       - run: make postinstall-vim
+      - run: otool -l ./usr/bin/vim
       - run: otool -L ./usr/bin/vim
       - run: ./usr/bin/vim --version
       - name: has +gettext
