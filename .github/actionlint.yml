@@ -1,7 +1,0 @@
-self-hosted-runner:
-  labels:
-    # patch
-    # https://github.com/rhysd/actionlint/issues/337
-    - macos-12-large
-    - macos-13-large
-    - macos-14-large
