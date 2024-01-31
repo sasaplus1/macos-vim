@@ -8,7 +8,14 @@ jobs:
   build:
     name: build
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # arm64
+        - os: macos-12-large
+        - os: macos-13-large
+        - os: macos-14-large
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: hendrikmuhs/ccache-action@v1.2
