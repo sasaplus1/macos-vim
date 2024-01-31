@@ -11,10 +11,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # arm64
-        - os: macos-12-large
-        - os: macos-13-large
-        - os: macos-14-large
+        include:
+          # arm64
+          - os: macos-12-large
+          - os: macos-13-large
+          - os: macos-14-large
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
