@@ -8,25 +8,38 @@ jobs:
   build:
     name: build
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-12
+          - os: macos-13
+          # arm64
+          - os: macos-14
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: hendrikmuhs/ccache-action@v1.2
       - run: echo "PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH" >> "$GITHUB_ENV"
+      - run: arch
+      - id: arch
+        run: echo "name=$(arch)" >> "$GITHUB_OUTPUT"
       - run: make
       - run: make download-gettext
       - run: make install-gettext
       - run: make download-lua
       - run: make install-lua
-      - run: make download-luajit
-      - run: make install-luajit
+      - if: steps.arch.outputs.name != 'arm64'
+        run: make download-luajit
+      - if: steps.arch.outputs.name != 'arm64'
+        run: make install-luajit
       - run: make download-vim
       - run: make install-vim
-      - run: cp usr/src/vim-*/src/auto/config.log config.log
+      - run: cp usr/src/vim-*/src/auto/config.log 'config-${{ matrix.os }}.log'
       - uses: actions/upload-artifact@v4
         with:
-          name: config.log
-          path: config.log
+          name: config-${{ matrix.os }}.log
+          path: config-${{ matrix.os }}.log
       - run: lipo -archs ./usr/bin/vim
       - run: otool -l ./usr/bin/vim
       - run: otool -L ./usr/bin/vim
