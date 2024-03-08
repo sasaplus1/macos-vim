@@ -35,11 +35,11 @@ jobs:
         run: make install-luajit
       - run: make download-vim
       - run: make install-vim
-      - run: cp usr/src/vim-*/src/auto/config.log config.log
+      - run: cp usr/src/vim-*/src/auto/config.log 'config-${{ matrix.os }}.log'
       - uses: actions/upload-artifact@v4
         with:
-          name: config.log
-          path: config.log
+          name: config-${{ matrix.os }}.log
+          path: config-${{ matrix.os }}.log
       - run: lipo -archs ./usr/bin/vim
       - run: otool -l ./usr/bin/vim
       - run: otool -L ./usr/bin/vim
