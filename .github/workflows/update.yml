@@ -15,7 +15,7 @@ jobs:
     name: update
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: >
           curl -fsSL https://api.github.com/repos/vim/vim/tags |
           jq -r '.[0].name' |
