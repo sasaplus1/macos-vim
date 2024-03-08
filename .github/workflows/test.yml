@@ -22,13 +22,17 @@ jobs:
       - uses: hendrikmuhs/ccache-action@v1.2
       - run: echo "PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH" >> "$GITHUB_ENV"
       - run: arch
+      - id: arch
+        run: echo "name=$(arch)" >> "$GITHUB_OUTPUT"
       - run: make
       - run: make download-gettext
       - run: make install-gettext
       - run: make download-lua
       - run: make install-lua
-      - run: make download-luajit
-      - run: make install-luajit
+      - if: steps.arch.outputs.name != 'arm64'
+        run: make download-luajit
+      - if: steps.arch.outputs.name != 'arm64'
+        run: make install-luajit
       - run: make download-vim
       - run: make install-vim
       - run: cp usr/src/vim-*/src/auto/config.log config.log
