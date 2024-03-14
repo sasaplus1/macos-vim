@@ -23,8 +23,8 @@ jobs:
           tee latest.txt
       - run: echo "value=$(cat latest.txt)" >> "$GITHUB_OUTPUT"
         id: version
-      - run: rm -f latest.txt Makefile.bak
       - run: sed -i.bak 's/vim_version := .*/vim_version := ${{ steps.version.outputs.value }}/' Makefile
+      - run: rm -f latest.txt Makefile.bak
       - run: |
           if git diff --exit-code --quiet
           then
