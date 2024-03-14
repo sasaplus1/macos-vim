@@ -47,4 +47,5 @@ jobs:
           --body ''
         env:
           GH_PROMPT_DISABLED: 1
+          GH_TOKEN: ${{ github.token }}
         if: steps.diff.outputs.changed
