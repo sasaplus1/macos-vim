@@ -36,16 +36,18 @@ jobs:
       - run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '<41898282+github-actions[bot]@users.noreply.github.com>'
+          git remote add origin 'https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}'
         if: steps.diff.outputs.changed
       - run: |
           git checkout -b 'update-to-${{ steps.version.outputs.value }}'
           git add .
           git commit -m 'update vim version' --allow-empty
         if: steps.diff.outputs.changed
+      - run: git push origin 'update-to-${{ steps.version.outputs.value }}'
+        if: steps.diff.outputs.changed
       - run: >
           gh pr create
           --body ''
-          --head 'update-to-${{ steps.version.outputs.value }}'
           --reviewer sasaplus1
           --title 'update vim version'
         env:
