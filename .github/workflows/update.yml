@@ -21,8 +21,10 @@ jobs:
           jq -r '.[0].name' |
           sed -e 's/^v//' |
           tee latest.txt
-      - run: sed -i.bak "s/vim_version := .*/vim_version := $(cat latest.txt)/" Makefile
+      - run: echo "value=$(cat latest.txt)" >> "$GITHUB_OUTPUT"
+        id: version
       - run: rm -f latest.txt Makefile.bak
+      - run: sed -i.bak 's/vim_version := .*/vim_version := ${{ steps.version.outputs.value }}/' Makefile
       - run: |
           if git diff --exit-code --quiet
           then
@@ -36,14 +38,14 @@ jobs:
           git config --global user.email '<41898282+github-actions[bot]@users.noreply.github.com>'
         if: steps.diff.outputs.changed
       - run: |
-          git checkout -b "update-to-$(cat latest.txt)"
+          git checkout -b 'update-to-${{ steps.version.outputs.value }}'
           git add .
           git commit -m 'update vim version' --allow-empty
         if: steps.diff.outputs.changed
       - run: >
           gh pr create
           --body ''
-          --head "update-to-$(cat latest.txt)"
+          --head 'update-to-${{ steps.version.outputs.value }}'
           --reviewer sasaplus1
           --title 'update vim version'
         env:
