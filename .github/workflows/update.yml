@@ -42,9 +42,10 @@ jobs:
         if: steps.diff.outputs.changed
       - run: >
           gh pr create
+          --body ''
+          --head "update-to-$(cat latest.txt)"
           --reviewer sasaplus1
           --title 'update vim version'
-          --body ''
         env:
           GH_PROMPT_DISABLED: 1
           GH_TOKEN: ${{ github.token }}
