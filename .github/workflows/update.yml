@@ -44,17 +44,12 @@ jobs:
         if: steps.diff.outputs.changed
       - run: git push origin 'update-to-${{ steps.version.outputs.value }}'
         if: steps.diff.outputs.changed
-      - uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { owner, repo } = context.repo;
-            await github.request(`POST /repos/${owner}/${repo}/pulls`, {
-              owner,
-              repo,
-              head: 'update-to-${{ steps.version.outputs.value }}',
-              base: 'master',
-              title: 'update vim version',
-              body: '',
-            });
+      - run: >
+          gh pr create
+          --body ''
+          --reviewer sasaplus1
+          --title 'update vim version'
+        env:
+          GH_PROMPT_DISABLED: 1
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: steps.diff.outputs.changed
