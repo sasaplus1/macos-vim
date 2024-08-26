@@ -56,11 +56,12 @@ vim_configs := $(strip \
   --enable-gui=no \
   --with-compiledby=sasa+1 \
   --with-features=huge \
-  --with-luajit \
   --with-lua-prefix='$(prefix)' \
   --without-x \
   --with-tlib=ncurses \
 )
+# without LuaJIT
+# --with-luajit \
 
 .PHONY: all
 all: ## output targets
@@ -74,9 +75,7 @@ clean: ## remove files
 install: ## install Vim and some additinal components
 install: download-gettext install-gettext
 install: download-lua install-lua
-ifneq ($(arch),arm64)
-install: download-luajit install-luajit
-endif
+# install: download-luajit install-luajit
 install: download-vim install-vim postinstall-vim
 
 .PHONY: download-gettext
