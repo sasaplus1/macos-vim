@@ -16,14 +16,24 @@ jobs:
           - os: macos-13
           # arm64
           - os: macos-14
+    env:
+      CC: 'ccache gcc'
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: hendrikmuhs/ccache-action@v1.2
-      - run: echo "PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH" >> "$GITHUB_ENV"
-      - run: arch
+      - run: echo "PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH" | tee -a "$GITHUB_ENV"
+      - run: ccache --show-config
+      - id: ccache
+        run: echo "cache_dir=$(ccache --show-config | grep cache_dir | awk '{ print $4 }')" | tee -a "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.ccache.outputs.cache_dir }}
+          # use ccache- key everytime :(
+          key: ccache-${{ hashFiles('usr/src/*/**/*') }}
+          restore-keys: ccache-
       - id: arch
-        run: echo "name=$(arch)" >> "$GITHUB_OUTPUT"
+        run: echo "name=$(arch)" | tee -a "$GITHUB_OUTPUT"
       - run: make
       - run: make download-gettext
       - run: make install-gettext
