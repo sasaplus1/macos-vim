@@ -56,14 +56,11 @@ vim_configs := $(strip \
   --enable-gui=no \
   --with-compiledby=sasa+1 \
   --with-features=huge \
+  --with-luajit \
   --with-lua-prefix='$(prefix)' \
   --without-x \
   --with-tlib=ncurses \
 )
-
-ifneq ($(arch),arm64)
-  vim_configs += --with-luajit
-endif
 
 .PHONY: all
 all: ## output targets
