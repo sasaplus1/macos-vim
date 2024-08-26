@@ -39,10 +39,8 @@ jobs:
       - run: make install-gettext
       - run: make download-lua
       - run: make install-lua
-      - if: steps.arch.outputs.name != 'arm64'
-        run: make download-luajit
-      - if: steps.arch.outputs.name != 'arm64'
-        run: make install-luajit
+      - run: make download-luajit
+      - run: make install-luajit
       - run: make download-vim
       - run: make install-vim
       - run: cp usr/src/vim-*/src/auto/config.log 'config-${{ matrix.os }}.log'
