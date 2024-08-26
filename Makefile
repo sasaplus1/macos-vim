@@ -37,7 +37,7 @@ gettext_configs := $(strip \
 )
 
 lua_version := 5.4.3
-luajit_version := 2.0.5
+luajit_version := 2.1.ROLLING
 
 vim_version := 9.1.0645
 vim_configs := $(strip \
@@ -92,7 +92,7 @@ download-lua: ## [subtarget] download Lua archive
 
 .PHONY: download-luajit
 download-luajit: ## [subtarget] download LuaJIT archive
-	curl -L -o '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' https://luajit.org/download/LuaJIT-$(luajit_version).tar.gz
+	curl -L -o '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v$(luajit_version).tar.gz
 
 .PHONY: download-vim
 download-vim: ## [subtarget] download Vim archive
