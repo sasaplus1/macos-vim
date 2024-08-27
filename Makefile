@@ -17,7 +17,7 @@ configure_configs := $(strip \
    --prefix='$(prefix)' \
 )
 
-gettext_version := 0.21
+gettext_version := 0.22
 gettext_configs := $(strip \
    --enable-option-checking \
    --disable-dependency-tracking \
@@ -37,7 +37,7 @@ gettext_configs := $(strip \
 )
 
 lua_version := 5.4.3
-luajit_version := 2.0.5
+luajit_version := 2.1.ROLLING
 
 vim_version := 9.1.0686
 vim_configs := $(strip \
@@ -60,10 +60,8 @@ vim_configs := $(strip \
   --without-x \
   --with-tlib=ncurses \
 )
-
-ifneq ($(arch),arm64)
-  vim_configs += --with-luajit
-endif
+# without LuaJIT
+# --with-luajit \
 
 .PHONY: all
 all: ## output targets
@@ -77,9 +75,7 @@ clean: ## remove files
 install: ## install Vim and some additinal components
 install: download-gettext install-gettext
 install: download-lua install-lua
-ifneq ($(arch),arm64)
-install: download-luajit install-luajit
-endif
+# install: download-luajit install-luajit
 install: download-vim install-vim postinstall-vim
 
 .PHONY: download-gettext
@@ -92,7 +88,7 @@ download-lua: ## [subtarget] download Lua archive
 
 .PHONY: download-luajit
 download-luajit: ## [subtarget] download LuaJIT archive
-	curl -L -o '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' https://luajit.org/download/LuaJIT-$(luajit_version).tar.gz
+	curl -L -o '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v$(luajit_version).tar.gz
 
 .PHONY: download-vim
 download-vim: ## [subtarget] download Vim archive
