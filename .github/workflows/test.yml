@@ -61,3 +61,9 @@ jobs:
         run: ./usr/bin/vim --not-a-term --clean --cmd 'lua print(_VERSION)' --cmd 'qall!'
       - name: output LuaJIT version
         run: ./usr/bin/vim --not-a-term --clean --cmd 'lua print(jit.version)' --cmd 'qall!'
+      - run: mv -f ./usr ./macos-vim
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-vim
+          path: macos-vim
+          include-hidden-files: true
