@@ -65,5 +65,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-vim
-          path: macos-vim
+          path: |
+            macos-vim/bin
+            macos-vim/lib
+            macos-vim/man
+            macos-vim/share
           include-hidden-files: true
