@@ -32,7 +32,7 @@ jobs:
           # use ccache- key everytime :(
           key: ccache-${{ hashFiles('usr/src/*/**/*') }}
           restore-keys: ccache-
-      - id: arch
+      - id: machine-arch
         run: echo "name=$(arch)" | tee -a "$GITHUB_OUTPUT"
       - run: make
       - run: make download-gettext
@@ -49,6 +49,8 @@ jobs:
           name: config-${{ matrix.os }}.log
           path: config-${{ matrix.os }}.log
       - run: lipo -archs ./usr/bin/vim
+      - id: vim-arch
+        run: echo "name=$(lipo -archs ./usr/bin/vim)" | tee -a "$GITHUB_OUTPUT"
       - run: otool -l ./usr/bin/vim
       - run: otool -L ./usr/bin/vim
       - run: make postinstall-vim
@@ -64,7 +66,7 @@ jobs:
       - run: mv -f ./usr ./macos-vim
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-vim
+          name: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim
           path: |
             macos-vim/bin
             macos-vim/lib
