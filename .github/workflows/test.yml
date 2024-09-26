@@ -64,12 +64,15 @@ jobs:
       - name: output LuaJIT version
         run: ./usr/bin/vim --not-a-term --clean --cmd 'lua print(jit.version)' --cmd 'qall!'
       - run: mv -f ./usr ./macos-vim
+      # save mode
+      - run: >
+          tar cfvJ ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim.tar.xz
+          macos-vim/bin
+          macos-vim/lib
+          macos-vim/man
+          macos-vim/share
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim
-          path: |
-            macos-vim/bin
-            macos-vim/lib
-            macos-vim/man
-            macos-vim/share
-          include-hidden-files: true
+          path: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim.tar.xz
+          if-no-files-found: error
