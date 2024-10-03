@@ -54,6 +54,7 @@ vim_configs := $(strip \
   --disable-rightleft \
   --disable-arabic \
   --enable-gui=no \
+  --disable-libsodium \
   --with-compiledby=sasa+1 \
   --with-features=huge \
   --with-lua-prefix='$(prefix)' \
