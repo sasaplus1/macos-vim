@@ -15,7 +15,7 @@
         "^Makefile$"
       ],
       "matchStrings": [
-        "vim_version\\s*:=\\s*(?<currentValue>\\S+)"
+        "vim_version\\s*:=\\s*(?<currentValue>v?\\S+)"
       ],
       "depNameTemplate": "vim/vim",
       "datasourceTemplate": "github-tags",
