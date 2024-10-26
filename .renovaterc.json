@@ -15,11 +15,10 @@
         "^Makefile$"
       ],
       "matchStrings": [
-        "vim_version\\s*:=\\s*(?<currentValue>\\S+)"
+        "vim_version\\s*:?=\\s*(?<currentValue>\\S+)"
       ],
       "depNameTemplate": "vim/vim",
       "datasourceTemplate": "github-tags",
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
       "extractVersionTemplate": "^v?(?<version>.*)$"
     }
   ]
