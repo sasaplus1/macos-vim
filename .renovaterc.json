@@ -18,7 +18,8 @@
         "vim_version\\s+:=\\s+(?<currentValue>\\S+)"
       ],
       "depNameTemplate": "vim/vim",
-      "datasourceTemplate": "github-tags"
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
     }
   ]
 }
