@@ -19,7 +19,7 @@
       ],
       "depNameTemplate": "vim/vim",
       "datasourceTemplate": "github-tags",
-      "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
     }
   ]
 }
