@@ -9,14 +9,16 @@
     ":timezone(Asia/Tokyo)"
   ],
   "customManagers": [
-    "customType": "regex",
-    "fileMatch": [
-      "^Makefile$"
-    ],
-    "matchStrings": [
-      "vim_version\\s+:=\\s+(?<currentValue>\\S+)"
-    ],
-    "depNameTemplate": "vim/vim",
-    "datasourceTemplate": "github-tags"
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^Makefile$"
+      ],
+      "matchStrings": [
+        "vim_version\\s+:=\\s+(?<currentValue>\\S+)"
+      ],
+      "depNameTemplate": "vim/vim",
+      "datasourceTemplate": "github-tags"
+    }
   ]
 }
