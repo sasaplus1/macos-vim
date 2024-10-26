@@ -19,8 +19,7 @@
       ],
       "depNameTemplate": "vim/vim",
       "datasourceTemplate": "github-tags",
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
-      "extractVersionTemplate": "^v?(?<version>.*)$"
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
     }
   ]
 }
