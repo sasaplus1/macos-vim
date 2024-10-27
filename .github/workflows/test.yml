@@ -20,13 +20,13 @@ jobs:
       CC: 'ccache gcc'
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: hendrikmuhs/ccache-action@v1.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: hendrikmuhs/ccache-action@ed74d11c0b343532753ecead8a951bb09bb34bc9 # v1.2
       - run: echo "PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH" | tee -a "$GITHUB_ENV"
       - run: ccache --show-config
       - id: ccache
         run: echo "cache_dir=$(ccache --show-config | grep cache_dir | awk '{ print $4 }')" | tee -a "$GITHUB_OUTPUT"
-      - uses: actions/cache@v4
+      - uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4
         with:
           path: ${{ steps.ccache.outputs.cache_dir }}
           # use ccache- key everytime :(
@@ -44,7 +44,7 @@ jobs:
       - run: make download-vim
       - run: make install-vim
       - run: cp usr/src/vim-*/src/auto/config.log 'config-${{ matrix.os }}.log'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
         with:
           name: config-${{ matrix.os }}.log
           path: config-${{ matrix.os }}.log
@@ -71,7 +71,7 @@ jobs:
           macos-vim/lib
           macos-vim/man
           macos-vim/share
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4
         with:
           name: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim
           path: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim.tar.xz
