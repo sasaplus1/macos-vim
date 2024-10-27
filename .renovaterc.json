@@ -19,6 +19,7 @@
         "gettext_version\\s*:?=\\s*(?<currentValue>\\S+)"
       ],
       "registryUrlTemplate": "https://git.savannah.gnu.org/git/gettext.git",
+      "depNameTemplate": "gettext",
       "datasourceTemplate": "git-tags",
       "versioningTemplate": "loose",
       "extractVersionTemplate": "^v?(?<version>.*)$"
@@ -31,6 +32,7 @@
       "matchStrings": [
         "lua_version\\s*:?=\\s*(?<currentValue>\\S+)"
       ],
+      "depName": "lua",
       "datasourceTemplate": "custom.lua",
       "versioningTemplate": "loose",
       "extractVersionTemplate": "^lua-(?<version>.+)\\.tar\\.gz$"
