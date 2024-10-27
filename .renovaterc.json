@@ -32,7 +32,7 @@
       "matchStrings": [
         "lua_version\\s*:?=\\s*(?<currentValue>\\S+)"
       ],
-      "depName": "lua",
+      "depNameTemplate": "lua",
       "datasourceTemplate": "custom.lua",
       "versioningTemplate": "loose",
       "extractVersionTemplate": "^lua-(?<version>.+)\\.tar\\.gz$"
