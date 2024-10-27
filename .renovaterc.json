@@ -15,6 +15,31 @@
         "^Makefile$"
       ],
       "matchStrings": [
+        "gettext_version\\s*:?=\\s*(?<currentValue>\\S+)"
+      ],
+      "registryUrlTemplate": "https://git.savannah.gnu.org/git/gettext.git",
+      "datasourceTemplate": "git-tags",
+      "versioningTemplate": "loose",
+      "extractVersionTemplate": "^v?(?<version>.*)$"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^Makefile$"
+      ],
+      "matchStrings": [
+        "lua_version\\s*:?=\\s*(?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "custom.lua",
+      "versioningTemplate": "loose",
+      "extractVersionTemplate": "^lua-(?<version>.+)\\.tar\\.gz$"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^Makefile$"
+      ],
+      "matchStrings": [
         "vim_version\\s*:?=\\s*(?<currentValue>\\S+)"
       ],
       "depNameTemplate": "vim/vim",
@@ -22,5 +47,11 @@
       "versioningTemplate": "loose",
       "extractVersionTemplate": "^v?(?<version>.*)$"
     }
-  ]
+  ],
+  "customDatasources": {
+    "lua": {
+      "defaultRegistryUrlTemplate": "https://www.lua.org/ftp/",
+      "format": "html"
+    }
+  }
 }
