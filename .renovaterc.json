@@ -19,6 +19,7 @@
       ],
       "depNameTemplate": "vim/vim",
       "datasourceTemplate": "github-tags",
+      "versioningTemplate": "loose",
       "extractVersionTemplate": "^v?(?<version>.*)$"
     }
   ]
