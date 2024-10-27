@@ -18,11 +18,10 @@
       "matchStrings": [
         "gettext_version\\s*:?=\\s*(?<currentValue>\\S+)"
       ],
-      "registryUrlTemplate": "git://git.savannah.gnu.org/gettext.git",
       "depNameTemplate": "gettext",
-      "datasourceTemplate": "git-tags",
+      "datasourceTemplate": "custom.gettext",
       "versioningTemplate": "loose",
-      "extractVersionTemplate": "^v?(?<version>.*)$"
+      "extractVersionTemplate": "^gettext-(?<version>.+)\\.tar\\.gz$"
     },
     {
       "customType": "regex",
@@ -52,6 +51,10 @@
     }
   ],
   "customDatasources": {
+    "gettext": {
+      "defaultRegistryUrlTemplate": "https://ftp.gnu.org/pub/gnu/gettext/",
+      "format": "html"
+    },
     "lua": {
       "defaultRegistryUrlTemplate": "https://www.lua.org/ftp/",
       "format": "html"
