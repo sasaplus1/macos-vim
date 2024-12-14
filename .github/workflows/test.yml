@@ -12,10 +12,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-12
           - os: macos-13
           # arm64
           - os: macos-14
+          - os: macos-15
     env:
       CC: 'ccache gcc'
     runs-on: ${{ matrix.os }}
