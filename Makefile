@@ -2,6 +2,8 @@
 
 SHELL := /bin/bash
 
+MACOSX_DEPLOYMENT_TARGET ?= 10.14
+
 makefile := $(abspath $(lastword $(MAKEFILE_LIST)))
 makefile_dir := $(dir $(makefile))
 
@@ -113,7 +115,7 @@ install-lua: ## [subtarget] install Lua
 install-luajit: ## [subtarget] install LuaJIT
 	$(RM) -r '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	tar fvx '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' -C '$(root)/usr/src'
-	MACOSX_DEPLOYMENT_TARGET=10.14 make -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
+	MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) make -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 
 .PHONY: install-vim
