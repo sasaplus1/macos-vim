@@ -2,6 +2,7 @@
 
 SHELL := /bin/bash
 
+WITH_LUAJIT ?=
 MACOSX_DEPLOYMENT_TARGET ?= 10.14
 
 makefile := $(abspath $(lastword $(MAKEFILE_LIST)))
@@ -63,8 +64,10 @@ vim_configs := $(strip \
   --without-x \
   --with-tlib=ncurses \
 )
-# without LuaJIT
-# --with-luajit \
+
+ifneq ($(WITH_LUAJIT),)
+vim_configs += --with-luajit
+endif
 
 .PHONY: all
 all: ## output targets
@@ -77,8 +80,11 @@ clean: ## remove files
 .PHONY: install
 install: ## install Vim and some additinal components
 install: download-gettext install-gettext
+ifeq ($(findstring --with-luajit,$(vim_configs)),--with-luajit)
+install: download-luajit install-luajit
+else
 install: download-lua install-lua
-# install: download-luajit install-luajit
+endif
 install: download-vim install-vim postinstall-vim
 
 .PHONY: download-gettext
