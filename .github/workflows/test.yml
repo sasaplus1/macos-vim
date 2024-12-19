@@ -29,12 +29,13 @@ jobs:
       - run: ccache --show-config
       - id: ccache
         run: echo "cache_dir=$(ccache --show-config | grep cache_dir | awk '{ print $4 }')" | tee -a "$GITHUB_OUTPUT"
-      - uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+      - uses: actions/cache/restore@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           path: ${{ steps.ccache.outputs.cache_dir }}
-          # use ccache- key everytime :(
-          key: ccache-${{ hashFiles('usr/src/*/**/*') }}
-          restore-keys: ccache-
+          key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
+          restore-keys: |
+            ccache-${{ hashFiles('usr/src/*.tar.*') }}
+            ccache-
       - id: machine-arch
         run: echo "name=$(arch)" | tee -a "$GITHUB_OUTPUT"
       - run: make
@@ -57,6 +58,11 @@ jobs:
         with:
           name: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
           path: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
+      - if: github.ref_name == 'master'
+        uses: actions/cache/save@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+        with:
+          path: ${{ steps.ccache.outputs.cache_dir }}
+          key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
       - run: lipo -archs ./usr/bin/vim
       - id: vim-arch
         run: echo "name=$(lipo -archs ./usr/bin/vim)" | tee -a "$GITHUB_OUTPUT"
