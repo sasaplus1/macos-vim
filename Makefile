@@ -118,15 +118,21 @@ install-lua: ## [subtarget] install Lua
 	make all install INSTALL_TOP='$(prefix)' -C '$(root)/usr/src/lua-$(lua_version)'
 
 .PHONY: install-luajit
+install-luajit: luajit_name := luajit-$(subst .ROLLING,,$(luajit_version))
 install-luajit: ## [subtarget] install LuaJIT
 	$(RM) -r '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	tar fvx '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' -C '$(root)/usr/src'
 	MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) make -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
-	ln -sf '$(prefix)/bin/luajit-2.1.' '$(prefix)/bin/luajit'
+	ln -sf '$(prefix)/bin/$(luajit_name).' '$(prefix)/bin/luajit'
+	# why can't vim find lua.h with -I option in build?
+	cp '$(prefix)/include/$(luajit_name)/lua.h' '$(prefix)/include'
 
 .PHONY: install-vim
 install-vim: CFLAGS := -I$(prefix)/include
+ifeq ($(findstring --with-luajit,$(vim_configs)),--with-luajit)
+install-vim: CFLAGS += -I$(prefix)/include/luajit-$(subst .ROLLING,,$(luajit_version))
+endif
 install-vim: LDFLAGS := -L$(prefix)/lib -Wl,-rpath,'@executable_path/../lib'
 install-vim: ## [subtarget] install Vim
 	$(RM) -r '$(root)/usr/src/vim-$(vim_version)'
