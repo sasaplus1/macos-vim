@@ -123,6 +123,7 @@ install-luajit: ## [subtarget] install LuaJIT
 	tar fvx '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' -C '$(root)/usr/src'
 	MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) make -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
+	ln -sf '$(prefix)/bin/luajit-2.1.' '$(prefix)/bin/luajit'
 
 .PHONY: install-vim
 install-vim: CFLAGS := -I$(prefix)/include
