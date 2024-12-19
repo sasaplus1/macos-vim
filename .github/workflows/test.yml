@@ -11,17 +11,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: macos-13
-            target: 13.0
+        os:
+          - macos-13
           # arm64
-          - os: macos-14
-            target: 14.0
-          - os: macos-15
-            target: 15.0
+          - macos-14
+          - macos-15
+        luajit:
+          - ''
+          - luajit
     env:
       CC: 'ccache gcc'
-      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -41,17 +40,21 @@ jobs:
       - run: make
       - run: make download-gettext
       - run: make install-gettext
-      - run: make download-lua
-      - run: make install-lua
-      - run: make download-luajit
-      - run: make install-luajit
+      - if: ${{ !matrix.luajit }}
+        run: make download-lua
+      - if: ${{ !matrix.luajit }}
+        run: make install-lua
+      - if: matrix.luajit
+        run: make download-luajit
+      - if: matrix.luajit
+        run: make install-luajit
       - run: make download-vim
       - run: make install-vim
       - run: cp usr/src/vim-*/src/auto/config.log 'config-${{ matrix.os }}.log'
       - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
-          name: config-${{ matrix.os }}.log
-          path: config-${{ matrix.os }}.log
+          name: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
+          path: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
       - run: lipo -archs ./usr/bin/vim
       - id: vim-arch
         run: echo "name=$(lipo -archs ./usr/bin/vim)" | tee -a "$GITHUB_OUTPUT"
@@ -77,6 +80,6 @@ jobs:
           macos-vim/share
       - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
-          name: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim
-          path: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim.tar.xz
+          name: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-${{ matrix.luajit || 'lua' }}-vim
+          path: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-${{ matrix.luajit || 'lua' }}-vim.tar.xz
           if-no-files-found: error
