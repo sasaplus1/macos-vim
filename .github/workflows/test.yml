@@ -48,9 +48,11 @@ jobs:
         run: make download-luajit
       - if: matrix.luajit
         run: make install-luajit
+      - if: matrix.luajit
+        run: echo 'WITH_LUAJIT=1' | tee -a "$GITHUB_ENV"
       - run: make download-vim
       - run: make install-vim
-      - run: cp usr/src/vim-*/src/auto/config.log 'config-${{ matrix.os }}.log'
+      - run: cp usr/src/vim-*/src/auto/config.log 'config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log'
       - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
           name: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
@@ -73,7 +75,7 @@ jobs:
       - run: mv -f ./usr ./macos-vim
       # save mode
       - run: >
-          tar cfvJ ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim.tar.xz
+          tar cfvJ ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-${{ matrix.luajit || 'lua' }}-vim.tar.xz
           macos-vim/bin
           macos-vim/lib
           macos-vim/man
