@@ -11,11 +11,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: macos-13
+        os:
+          - macos-13
           # arm64
-          - os: macos-14
-          - os: macos-15
+          - macos-14
+          - macos-15
+        luajit:
+          - ''
+          - luajit
     env:
       CC: 'ccache gcc'
     runs-on: ${{ matrix.os }}
@@ -26,28 +29,40 @@ jobs:
       - run: ccache --show-config
       - id: ccache
         run: echo "cache_dir=$(ccache --show-config | grep cache_dir | awk '{ print $4 }')" | tee -a "$GITHUB_OUTPUT"
-      - uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+      - uses: actions/cache/restore@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           path: ${{ steps.ccache.outputs.cache_dir }}
-          # use ccache- key everytime :(
-          key: ccache-${{ hashFiles('usr/src/*/**/*') }}
-          restore-keys: ccache-
+          key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
+          restore-keys: |
+            ccache-${{ hashFiles('usr/src/*.tar.*') }}
+            ccache-
       - id: machine-arch
         run: echo "name=$(arch)" | tee -a "$GITHUB_OUTPUT"
       - run: make
       - run: make download-gettext
       - run: make install-gettext
-      - run: make download-lua
-      - run: make install-lua
-      - run: make download-luajit
-      - run: make install-luajit
+      - if: ${{ !matrix.luajit }}
+        run: make download-lua
+      - if: ${{ !matrix.luajit }}
+        run: make install-lua
+      - if: matrix.luajit
+        run: make download-luajit
+      - if: matrix.luajit
+        run: make install-luajit
+      - if: matrix.luajit
+        run: echo 'WITH_LUAJIT=1' | tee -a "$GITHUB_ENV"
       - run: make download-vim
       - run: make install-vim
-      - run: cp usr/src/vim-*/src/auto/config.log 'config-${{ matrix.os }}.log'
+      - run: cp usr/src/vim-*/src/auto/config.log 'config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log'
       - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
-          name: config-${{ matrix.os }}.log
-          path: config-${{ matrix.os }}.log
+          name: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
+          path: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
+      - if: github.ref_name == 'master'
+        uses: actions/cache/save@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+        with:
+          path: ${{ steps.ccache.outputs.cache_dir }}
+          key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
       - run: lipo -archs ./usr/bin/vim
       - id: vim-arch
         run: echo "name=$(lipo -archs ./usr/bin/vim)" | tee -a "$GITHUB_OUTPUT"
@@ -66,13 +81,13 @@ jobs:
       - run: mv -f ./usr ./macos-vim
       # save mode
       - run: >
-          tar cfvJ ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim.tar.xz
+          tar cfvJ ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-${{ matrix.luajit || 'lua' }}-vim.tar.xz
           macos-vim/bin
           macos-vim/lib
           macos-vim/man
           macos-vim/share
       - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
-          name: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim
-          path: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-vim.tar.xz
+          name: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-${{ matrix.luajit || 'lua' }}-vim
+          path: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-${{ matrix.luajit || 'lua' }}-vim.tar.xz
           if-no-files-found: error

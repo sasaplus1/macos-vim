@@ -16,6 +16,12 @@ if you want to change install directory:
 $ make install prefix=/path/to/dir
 ```
 
+if you want LuaJIT:
+
+```console
+$ WITH_LUAJIT=1 make install
+```
+
 see `Makefile` for more details.
 
 ## License
