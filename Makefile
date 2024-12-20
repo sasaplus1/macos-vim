@@ -142,6 +142,12 @@ install-vim: ## [subtarget] install Vim
 	make -j$(nproc) -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
 
+# NOTE: $(shell find) is evaluate in first time
+# # fail:
+# $ make install
+# # success:
+# $ make install
+# $ make postinstall-vim
 .PHONY: postinstall-vim
 postinstall-vim: exe_file := $(shell find '$(abspath $(prefix)/bin)' -type f -perm -111 -print)
 postinstall-vim: arg_file := $(shell mktemp)
