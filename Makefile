@@ -122,6 +122,7 @@ install-luajit: luajit_name := luajit-$(subst .ROLLING,,$(luajit_version))
 install-luajit: ## [subtarget] install LuaJIT
 	$(RM) -r '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	tar fvx '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' -C '$(root)/usr/src'
+	sed -i.bak -e '/-DLUAJIT_ENABLE_LUA52COMPAT/s/^#//' '$(root)/usr/src/LuaJIT-$(luajit_version)/Makefile'
 	MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) make -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	ln -sf '$(prefix)/bin/$(luajit_name).' '$(prefix)/bin/luajit'
