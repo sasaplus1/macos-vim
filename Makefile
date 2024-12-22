@@ -142,7 +142,7 @@ install-vim: ## [subtarget] install Vim
 	make -j$(nproc) -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'
 
-# NOTE: $(shell find) is evaluate in first time
+# BUG: $(shell find) is evaluate in first time
 # # fail:
 # $ make install
 # # success:
