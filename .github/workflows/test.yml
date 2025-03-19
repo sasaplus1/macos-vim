@@ -29,7 +29,7 @@ jobs:
       - run: ccache --show-config
       - id: ccache
         run: echo "cache_dir=$(ccache --show-config | grep cache_dir | awk '{ print $4 }')" | tee -a "$GITHUB_OUTPUT"
-      - uses: actions/cache/restore@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+      - uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: ${{ steps.ccache.outputs.cache_dir }}
           key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
@@ -59,7 +59,7 @@ jobs:
           name: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
           path: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
       - if: github.ref_name == 'master'
-        uses: actions/cache/save@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: ${{ steps.ccache.outputs.cache_dir }}
           key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
