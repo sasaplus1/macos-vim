@@ -42,7 +42,7 @@ gettext_configs := $(strip \
 lua_version := 5.4.7
 luajit_version := 2.1.ROLLING
 
-vim_version := 9.1.1251
+vim_version := 9.1.1255
 vim_configs := $(strip \
   --enable-fail-if-missing \
   --disable-smack \
