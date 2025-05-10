@@ -8,8 +8,8 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^Makefile$"
+      "managerFilePatterns": [
+        "/^Makefile$/"
       ],
       "matchStrings": [
         "gettext_version\\s*:?=\\s*(?<currentValue>\\S+)"
@@ -21,8 +21,8 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^Makefile$"
+      "managerFilePatterns": [
+        "/^Makefile$/"
       ],
       "matchStrings": [
         "lua_version\\s*:?=\\s*(?<currentValue>\\S+)"
@@ -34,8 +34,8 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^Makefile$"
+      "managerFilePatterns": [
+        "/^Makefile$/"
       ],
       "matchStrings": [
         "vim_version\\s*:?=\\s*(?<currentValue>\\S+)"
