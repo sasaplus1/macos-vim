@@ -39,7 +39,7 @@ gettext_configs := $(strip \
    --without-xz \
 )
 
-lua_version := 5.4.7
+lua_version := 5.4.8
 luajit_version := 2.1.ROLLING
 
 vim_version := 9.1.1429
