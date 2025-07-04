@@ -20,7 +20,7 @@ configure_configs := $(strip \
    --prefix='$(prefix)' \
 )
 
-gettext_version := 0.22.5
+gettext_version := 0.25.1
 gettext_configs := $(strip \
    --enable-option-checking \
    --disable-dependency-tracking \
