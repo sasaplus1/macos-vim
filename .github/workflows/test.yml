@@ -1,8 +1,16 @@
 name: test
 
 on:
-  - push
-  - pull_request
+  push:
+    paths:
+      - '.github/workflows/test.yml'
+      - 'Makefile'
+      - 'usr'
+  pull_request:
+    paths:
+      - '.github/workflows/test.yml'
+      - 'Makefile'
+      - 'usr'
 
 jobs:
   build:

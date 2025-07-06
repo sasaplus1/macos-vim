@@ -25,6 +25,19 @@
         "/^Makefile$/"
       ],
       "matchStrings": [
+        "libiconv_version\\s*:?=\\s*(?<currentValue>\\S+)"
+      ],
+      "depNameTemplate": "libiconv",
+      "datasourceTemplate": "custom.libiconv",
+      "versioningTemplate": "loose",
+      "extractVersionTemplate": "^libiconv-(?<version>.+)\\.tar\\.gz$"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Makefile$/"
+      ],
+      "matchStrings": [
         "lua_version\\s*:?=\\s*(?<currentValue>\\S+)"
       ],
       "depNameTemplate": "lua",
@@ -49,6 +62,10 @@
   "customDatasources": {
     "gettext": {
       "defaultRegistryUrlTemplate": "https://ftp.gnu.org/pub/gnu/gettext/",
+      "format": "html"
+    },
+    "libiconv": {
+      "defaultRegistryUrlTemplate": "https://ftp.gnu.org/pub/gnu/libiconv/",
       "format": "html"
     },
     "lua": {
