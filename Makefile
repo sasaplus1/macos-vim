@@ -20,7 +20,7 @@ configure_configs := $(strip \
    --prefix='$(prefix)' \
 )
 
-gettext_version := 0.22.5
+gettext_version := 0.25.1
 gettext_configs := $(strip \
    --enable-option-checking \
    --disable-dependency-tracking \
@@ -37,6 +37,18 @@ gettext_configs := $(strip \
    --without-cvs \
    --without-bzip2 \
    --without-xz \
+   --with-libiconv-prefix='$(prefix)' \
+)
+
+libiconv_version := 1.18
+libiconv_configs := $(strip \
+   --enable-option-checking \
+   --disable-dependency-tracking \
+   --enable-fast-install \
+   --enable-static \
+   --enable-shared \
+   --disable-rpath \
+   --disable-nls \
 )
 
 lua_version := 5.4.8
@@ -79,6 +91,7 @@ clean: ## remove files
 
 .PHONY: install
 install: ## install Vim and some additinal components
+install: download-libiconv install-libiconv
 install: download-gettext install-gettext
 ifeq ($(findstring --with-luajit,$(vim_configs)),--with-luajit)
 install: download-luajit install-luajit
@@ -90,6 +103,10 @@ install: download-vim install-vim postinstall-vim
 .PHONY: download-gettext
 download-gettext: ## [subtarget] download gettext archive
 	curl -L -o '$(root)/usr/src/gettext-$(gettext_version).tar.xz' https://ftp.gnu.org/pub/gnu/gettext/gettext-$(gettext_version).tar.xz
+
+.PHONY: download-libiconv
+download-libiconv: ## [subtarget] download libiconv archive
+	curl -L -o '$(root)/usr/src/libiconv-$(libiconv_version).tar.gz' https://ftp.gnu.org/pub/gnu/libiconv/libiconv-$(libiconv_version).tar.gz
 
 .PHONY: download-lua
 download-lua: ## [subtarget] download Lua archive
@@ -104,12 +121,22 @@ download-vim: ## [subtarget] download Vim archive
 	curl -L -o '$(root)/usr/src/v$(vim_version).tar.gz' https://github.com/vim/vim/archive/v$(vim_version).tar.gz
 
 .PHONY: install-gettext
+install-gettext: CFLAGS := -I$(prefix)/include
+install-gettext: LDFLAGS := -L$(prefix)/lib
 install-gettext: ## [subtarget] install gettext
 	$(RM) -r '$(root)/usr/src/gettext-$(gettext_version)'
 	tar fvx '$(root)/usr/src/gettext-$(gettext_version).tar.xz' -C '$(root)/usr/src'
-	cd '$(root)/usr/src/gettext-$(gettext_version)' && ./configure $(configure_configs) $(gettext_configs)
+	cd '$(root)/usr/src/gettext-$(gettext_version)' && CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' ./configure $(configure_configs) $(gettext_configs)
 	make -j$(nproc) -C '$(root)/usr/src/gettext-$(gettext_version)'
 	make install -C '$(root)/usr/src/gettext-$(gettext_version)'
+
+.PHONY: install-libiconv
+install-libiconv: ## [subtarget] install libiconv
+	$(RM) -r '$(root)/usr/src/libiconv-$(libiconv_version)'
+	tar fvx '$(root)/usr/src/libiconv-$(libiconv_version).tar.gz' -C '$(root)/usr/src'
+	cd '$(root)/usr/src/libiconv-$(libiconv_version)' && ./configure $(configure_configs) $(libiconv_configs)
+	make -j$(nproc) -C '$(root)/usr/src/libiconv-$(libiconv_version)'
+	make install -C '$(root)/usr/src/libiconv-$(libiconv_version)'
 
 .PHONY: install-lua
 install-lua: ## [subtarget] install Lua
