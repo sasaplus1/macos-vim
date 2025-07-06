@@ -25,4 +25,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           interval: 30
-          timeout: ${{ 30 * 60 }}
+          timeout: 1800 # 30 * 60
