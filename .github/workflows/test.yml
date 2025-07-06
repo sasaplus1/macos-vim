@@ -39,6 +39,8 @@ jobs:
       - id: machine-arch
         run: echo "name=$(arch)" | tee -a "$GITHUB_OUTPUT"
       - run: make
+      - run: make download-libiconv
+      - run: make install-libiconv
       - run: make download-gettext
       - run: make install-gettext
       - if: ${{ !matrix.luajit }}
