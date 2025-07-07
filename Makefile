@@ -96,55 +96,63 @@ endif
 install: download-vim install-vim postinstall-vim
 
 .PHONY: download-gettext
-download-gettext: ## [subtarget] download gettext archive
-	curl -L -o '$(root)/usr/src/gettext-$(gettext_version).tar.xz' https://ftp.gnu.org/pub/gnu/gettext/gettext-$(gettext_version).tar.xz
+download-gettext: ## [subtarget] download and extract gettext archive
+	@test -f '$(root)/usr/src/gettext-$(gettext_version).tar.xz' || \
+		curl -L -o '$(root)/usr/src/gettext-$(gettext_version).tar.xz' https://ftp.gnu.org/pub/gnu/gettext/gettext-$(gettext_version).tar.xz
+	@test -d '$(root)/usr/src/gettext-$(gettext_version)' || \
+		tar fvx '$(root)/usr/src/gettext-$(gettext_version).tar.xz' -C '$(root)/usr/src'
 
 .PHONY: download-libiconv
-download-libiconv: ## [subtarget] download libiconv archive
-	curl -L -o '$(root)/usr/src/libiconv-$(libiconv_version).tar.gz' https://ftp.gnu.org/pub/gnu/libiconv/libiconv-$(libiconv_version).tar.gz
+download-libiconv: ## [subtarget] download and extract libiconv archive
+	@test -f '$(root)/usr/src/libiconv-$(libiconv_version).tar.gz' || \
+		curl -L -o '$(root)/usr/src/libiconv-$(libiconv_version).tar.gz' https://ftp.gnu.org/pub/gnu/libiconv/libiconv-$(libiconv_version).tar.gz
+	@test -d '$(root)/usr/src/libiconv-$(libiconv_version)' || \
+		tar fvx '$(root)/usr/src/libiconv-$(libiconv_version).tar.gz' -C '$(root)/usr/src'
 
 .PHONY: download-lua
-download-lua: ## [subtarget] download Lua archive
-	curl -L -o '$(root)/usr/src/lua-$(lua_version).tar.gz' https://www.lua.org/ftp/lua-$(lua_version).tar.gz
+download-lua: ## [subtarget] download and extract Lua archive
+	@test -f '$(root)/usr/src/lua-$(lua_version).tar.gz' || \
+		curl -L -o '$(root)/usr/src/lua-$(lua_version).tar.gz' https://www.lua.org/ftp/lua-$(lua_version).tar.gz
+	@test -d '$(root)/usr/src/lua-$(lua_version)' || \
+		tar fvx '$(root)/usr/src/lua-$(lua_version).tar.gz' -C '$(root)/usr/src'
 
 .PHONY: download-luajit
-download-luajit: ## [subtarget] download LuaJIT archive
-	curl -L -o '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v$(luajit_version).tar.gz
+download-luajit: ## [subtarget] download and extract LuaJIT archive
+	@test -f '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' || \
+		curl -L -o '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v$(luajit_version).tar.gz
+	@test -d '$(root)/usr/src/LuaJIT-$(luajit_version)' || \
+		tar fvx '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' -C '$(root)/usr/src'
 
 .PHONY: download-vim
-download-vim: ## [subtarget] download Vim archive
-	curl -L -o '$(root)/usr/src/v$(vim_version).tar.gz' https://github.com/vim/vim/archive/v$(vim_version).tar.gz
+download-vim: ## [subtarget] download and extract Vim archive
+	@test -f '$(root)/usr/src/v$(vim_version).tar.gz' || \
+		curl -L -o '$(root)/usr/src/v$(vim_version).tar.gz' https://github.com/vim/vim/archive/v$(vim_version).tar.gz
+	@test -d '$(root)/usr/src/vim-$(vim_version)' || \
+		tar fvx '$(root)/usr/src/v$(vim_version).tar.gz' -C '$(root)/usr/src/'
 
 .PHONY: install-gettext
 install-gettext: CFLAGS := -I$(prefix)/include
 install-gettext: LDFLAGS := -L$(prefix)/lib
 install-gettext: ## [subtarget] install gettext
-	$(RM) -r '$(root)/usr/src/gettext-$(gettext_version)'
-	tar fvx '$(root)/usr/src/gettext-$(gettext_version).tar.xz' -C '$(root)/usr/src'
 	cd '$(root)/usr/src/gettext-$(gettext_version)' && CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' ./configure $(configure_configs) $(gettext_configs)
 	make -j$(nproc) -C '$(root)/usr/src/gettext-$(gettext_version)'
 	make install -C '$(root)/usr/src/gettext-$(gettext_version)'
 
 .PHONY: install-libiconv
 install-libiconv: ## [subtarget] install libiconv
-	$(RM) -r '$(root)/usr/src/libiconv-$(libiconv_version)'
-	tar fvx '$(root)/usr/src/libiconv-$(libiconv_version).tar.gz' -C '$(root)/usr/src'
 	cd '$(root)/usr/src/libiconv-$(libiconv_version)' && ./configure $(configure_configs) $(libiconv_configs)
 	make -j$(nproc) -C '$(root)/usr/src/libiconv-$(libiconv_version)'
 	make install -C '$(root)/usr/src/libiconv-$(libiconv_version)'
 
 .PHONY: install-lua
 install-lua: ## [subtarget] install Lua
-	$(RM) -r '$(root)/usr/src/lua-$(lua_version)'
-	tar fvx '$(root)/usr/src/lua-$(lua_version).tar.gz' -C '$(root)/usr/src'
 	make all install INSTALL_TOP='$(prefix)' -C '$(root)/usr/src/lua-$(lua_version)'
 
 .PHONY: install-luajit
 install-luajit: luajit_name := luajit-$(subst .ROLLING,,$(luajit_version))
 install-luajit: ## [subtarget] install LuaJIT
-	$(RM) -r '$(root)/usr/src/LuaJIT-$(luajit_version)'
-	tar fvx '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' -C '$(root)/usr/src'
-	sed -i.bak -e '/-DLUAJIT_ENABLE_LUA52COMPAT/s/^#//' '$(root)/usr/src/LuaJIT-$(luajit_version)/Makefile'
+	@grep -q '^XCFLAGS+= -DLUAJIT_ENABLE_LUA52COMPAT' '$(root)/usr/src/LuaJIT-$(luajit_version)/Makefile' || \
+		sed -i.bak -e '/-DLUAJIT_ENABLE_LUA52COMPAT/s/^#//' '$(root)/usr/src/LuaJIT-$(luajit_version)/Makefile'
 	MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) make -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	ln -sf '$(prefix)/bin/$(luajit_name).' '$(prefix)/bin/luajit'
@@ -158,8 +166,11 @@ install-vim: CFLAGS += -I$(prefix)/include/luajit-$(subst .ROLLING,,$(luajit_ver
 endif
 install-vim: LDFLAGS := -L$(prefix)/lib -Wl,-rpath,'@executable_path/../lib'
 install-vim: ## [subtarget] install Vim
-	$(RM) -r '$(root)/usr/src/vim-$(vim_version)'
-	tar fvx '$(root)/usr/src/v$(vim_version).tar.gz' -C '$(root)/usr/src/'
+	# Clean up if needed for reconfigure
+	@test ! -f '$(root)/usr/src/vim-$(vim_version)/src/auto/config.cache' || \
+		$(RM) '$(root)/usr/src/vim-$(vim_version)/src/auto/config.cache'
+	@test ! -f '$(root)/usr/src/vim-$(vim_version)/src/Makefile' || \
+		make distclean -C '$(root)/usr/src/vim-$(vim_version)/src' || true
 	cd '$(root)/usr/src/vim-$(vim_version)' && CFLAGS='$(CFLAGS)' LDFLAGS="$(LDFLAGS)" PATH='$(prefix)/bin':$$PATH ./configure $(configure_configs) $(vim_configs)
 	make -j$(nproc) -C '$(root)/usr/src/vim-$(vim_version)'
 	make install -C '$(root)/usr/src/vim-$(vim_version)'

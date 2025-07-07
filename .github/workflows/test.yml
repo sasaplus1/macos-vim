@@ -35,14 +35,20 @@ jobs:
       - uses: hendrikmuhs/ccache-action@63069e3931dedbf3b63792097479563182fe70d1 # v1.2
       - run: echo "PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH" | tee -a "$GITHUB_ENV"
       - run: ccache --show-config
+      - run: ccache -z  # Zero statistics
       - id: ccache
         run: echo "cache_dir=$(ccache --show-config | grep cache_dir | awk '{ print $4 }')" | tee -a "$GITHUB_OUTPUT"
       - uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        id: cache-restore
         with:
-          path: ${{ steps.ccache.outputs.cache_dir }}
-          key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
+          path: |
+            ${{ steps.ccache.outputs.cache_dir }}
+            usr/src
+          key: ccache-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}-${{ hashFiles('usr/src/*.tar.*') }}
           restore-keys: |
-            ccache-${{ hashFiles('usr/src/*.tar.*') }}
+            ccache-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}-${{ hashFiles('usr/src/*.tar.*') }}
+            ccache-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}-
+            ccache-${{ matrix.os }}-
             ccache-
       - id: machine-arch
         run: echo "name=$(arch)" | tee -a "$GITHUB_OUTPUT"
@@ -51,6 +57,7 @@ jobs:
       - run: make install-libiconv
       - run: make download-gettext
       - run: make install-gettext
+      - run: ccache -s
       - if: ${{ !matrix.luajit }}
         run: make download-lua
       - if: ${{ !matrix.luajit }}
@@ -63,6 +70,7 @@ jobs:
         run: echo 'WITH_LUAJIT=1' | tee -a "$GITHUB_ENV"
       - run: make download-vim
       - run: make install-vim
+      - run: ccache -s
       - run: cp usr/src/vim-*/src/auto/config.log 'config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log'
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -71,8 +79,10 @@ jobs:
       - if: github.ref_name == 'master'
         uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
-          path: ${{ steps.ccache.outputs.cache_dir }}
-          key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
+          path: |
+            ${{ steps.ccache.outputs.cache_dir }}
+            usr/src
+          key: ccache-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}-${{ hashFiles('usr/src/*.tar.*') }}
       - run: lipo -archs ./usr/bin/vim
       - id: vim-arch
         run: echo "name=$(lipo -archs ./usr/bin/vim)" | tee -a "$GITHUB_OUTPUT"
