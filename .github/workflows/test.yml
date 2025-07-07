@@ -101,13 +101,3 @@ jobs:
           name: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-${{ matrix.luajit || 'lua' }}-vim
           path: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-${{ matrix.luajit || 'lua' }}-vim.tar.xz
           if-no-files-found: error
-  build-result:
-    if: >
-      !cancelled()
-      && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository)
-    needs:
-      - build
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    steps:
-      - run: test '${{ needs.build.result }}' != 'failure'
