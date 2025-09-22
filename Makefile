@@ -52,7 +52,7 @@ libiconv_configs := $(strip \
 lua_version := 5.4.8
 luajit_version := 2.1.ROLLING
 
-vim_version := 9.1.1782
+vim_version := 9.1.1785
 vim_configs := $(strip \
   --enable-fail-if-missing \
   --disable-smack \
