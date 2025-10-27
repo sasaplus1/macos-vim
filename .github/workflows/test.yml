@@ -64,7 +64,7 @@ jobs:
       - run: make download-vim
       - run: make install-vim
       - run: cp usr/src/vim-*/src/auto/config.log 'config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log'
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
           path: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
@@ -96,7 +96,7 @@ jobs:
           macos-vim/lib
           macos-vim/man
           macos-vim/share
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-${{ matrix.luajit || 'lua' }}-vim
           path: ${{ matrix.os }}-${{ steps.vim-arch.outputs.name }}-${{ matrix.luajit || 'lua' }}-vim.tar.xz
