@@ -47,17 +47,27 @@ jobs:
             ccache-
       - id: machine-arch
         run: echo "name=$(arch)" | tee -a "$GITHUB_OUTPUT"
+      - id: archive-versions
+        run: |
+          key=$(grep -E '(gettext|libiconv|lua|luajit)_version' Makefile | sort | shasum -a 1 | cut -d ' ' -f 1)
+          echo "key=archives-$key" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: usr/src
+          key: ${{ steps.archive-versions.outputs.key }}
+          restore-keys: |
+            archives-
       - run: make
-      - run: make download-libiconv
+      - run: test -f usr/src/libiconv-*.tar.gz || make download-libiconv
       - run: make install-libiconv
-      - run: make download-gettext
+      - run: test -f usr/src/gettext-*.tar.xz || make download-gettext
       - run: make install-gettext
       - if: ${{ !matrix.luajit }}
-        run: make download-lua
+        run: test -f usr/src/lua-*.tar.gz || make download-lua
       - if: ${{ !matrix.luajit }}
         run: make install-lua
       - if: matrix.luajit
-        run: make download-luajit
+        run: test -f usr/src/LuaJIT-*.tar.gz || make download-luajit
       - if: matrix.luajit
         run: make install-luajit
       - if: matrix.luajit
@@ -74,6 +84,13 @@ jobs:
         with:
           path: ${{ steps.ccache.outputs.cache_dir }}
           key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
+      - if: github.ref_name == 'master'
+        run: rm -f usr/src/v*.tar.gz
+      - if: github.ref_name == 'master'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: usr/src
+          key: ${{ steps.archive-versions.outputs.key }}
       - run: lipo -archs ./usr/bin/vim
       - id: vim-arch
         run: echo "name=$(lipo -archs ./usr/bin/vim)" | tee -a "$GITHUB_OUTPUT"
