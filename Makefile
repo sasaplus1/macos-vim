@@ -97,11 +97,11 @@ install: download-vim install-vim postinstall-vim
 
 .PHONY: download-gettext
 download-gettext: ## [subtarget] download gettext archive
-	curl -L -o '$(root)/usr/src/gettext-$(gettext_version).tar.xz' https://ftpmirror.gnu.org/pub/gnu/gettext/gettext-$(gettext_version).tar.xz
+	curl -L -o '$(root)/usr/src/gettext-$(gettext_version).tar.xz' https://ftpmirror.gnu.org/gettext/gettext-$(gettext_version).tar.xz
 
 .PHONY: download-libiconv
 download-libiconv: ## [subtarget] download libiconv archive
-	curl -L -o '$(root)/usr/src/libiconv-$(libiconv_version).tar.gz' https://ftpmirror.gnu.org/pub/gnu/libiconv/libiconv-$(libiconv_version).tar.gz
+	curl -L -o '$(root)/usr/src/libiconv-$(libiconv_version).tar.gz' https://ftpmirror.gnu.org/libiconv/libiconv-$(libiconv_version).tar.gz
 
 .PHONY: download-lua
 download-lua: ## [subtarget] download Lua archive
