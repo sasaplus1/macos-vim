@@ -84,7 +84,7 @@ jobs:
           path: ${{ steps.ccache.outputs.cache_dir }}
           key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
       - if: github.ref_name == 'master'
-        run: rm -f usr/src/v*.tar.gz
+        run: rm -rf usr/src/v*.tar.gz usr/src/vim-*
       - if: github.ref_name == 'master'
         uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
