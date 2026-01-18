@@ -37,7 +37,7 @@ jobs:
       - run: ccache --show-config
       - id: ccache
         run: echo "cache_dir=$(ccache --show-config | grep cache_dir | awk '{ print $4 }')" | tee -a "$GITHUB_OUTPUT"
-      - uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      - uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ${{ steps.ccache.outputs.cache_dir }}
           key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
@@ -50,7 +50,7 @@ jobs:
         run: |
           key=$(grep -E '(gettext|libiconv|lua|luajit)_version' Makefile | sort | shasum -a 1 | cut -d ' ' -f 1)
           echo "key=archives-$key" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      - uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: usr/src
           key: ${{ steps.archive-versions.outputs.key }}
@@ -79,14 +79,14 @@ jobs:
           name: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
           path: config-${{ matrix.os }}-${{ matrix.luajit || 'lua' }}.log
       - if: github.ref_name == 'master'
-        uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ${{ steps.ccache.outputs.cache_dir }}
           key: ccache-${{ hashFiles('usr/src/*.tar.*') }}
       - if: github.ref_name == 'master'
         run: rm -rf usr/src/v*.tar.gz usr/src/vim-*
       - if: github.ref_name == 'master'
-        uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: usr/src
           key: ${{ steps.archive-versions.outputs.key }}
