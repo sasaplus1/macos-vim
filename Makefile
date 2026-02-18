@@ -49,6 +49,15 @@ libiconv_configs := $(strip \
    --disable-nls \
 )
 
+libsodium_version := 1.0.21
+libsodium_configs := $(strip \
+   --enable-option-checking \
+   --disable-dependency-tracking \
+   --enable-static \
+   --enable-shared \
+   --disable-debug \
+)
+
 lua_version := 5.5.0
 luajit_version := 2.1.ROLLING
 
@@ -93,6 +102,7 @@ install: download-luajit install-luajit
 else
 install: download-lua install-lua
 endif
+install: download-libsodium install-libsodium
 install: download-vim install-vim postinstall-vim
 
 .PHONY: download-gettext
@@ -110,6 +120,10 @@ download-lua: ## [subtarget] download Lua archive
 .PHONY: download-luajit
 download-luajit: ## [subtarget] download LuaJIT archive
 	curl -L -o '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v$(luajit_version).tar.gz
+
+.PHONY: download-libsodium
+download-libsodium: ## [subtarget] download libsodium archive
+	curl -L -o '$(root)/usr/src/libsodium-$(libsodium_version).tar.gz' https://download.libsodium.org/libsodium/releases/libsodium-$(libsodium_version).tar.gz
 
 .PHONY: download-vim
 download-vim: ## [subtarget] download Vim archive
@@ -151,6 +165,16 @@ install-luajit: ## [subtarget] install LuaJIT
 	# why can't vim find lua.h with -I option in build?
 	cp '$(prefix)/include/$(luajit_name)/lua.h' '$(prefix)/include'
 
+.PHONY: install-libsodium
+install-libsodium: CFLAGS := -I$(prefix)/include
+install-libsodium: LDFLAGS := -L$(prefix)/lib
+install-libsodium: ## [subtarget] install libsodium
+	$(RM) -r '$(root)/usr/src/libsodium-$(libsodium_version)'
+	tar fvx '$(root)/usr/src/libsodium-$(libsodium_version).tar.gz' -C '$(root)/usr/src'
+	cd '$(root)/usr/src/libsodium-$(libsodium_version)' && CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' ./configure $(configure_configs) $(libsodium_configs)
+	make -j$(nproc) -C '$(root)/usr/src/libsodium-$(libsodium_version)'
+	make install -C '$(root)/usr/src/libsodium-$(libsodium_version)'
+
 .PHONY: install-vim
 install-vim: CFLAGS := -I$(prefix)/include
 ifeq ($(findstring --with-luajit,$(vim_configs)),--with-luajit)
@@ -173,7 +197,7 @@ install-vim: ## [subtarget] install Vim
 .PHONY: postinstall-vim
 postinstall-vim: exe_file := $(shell find '$(abspath $(prefix)/bin)' -type f -perm -111 -print)
 postinstall-vim: arg_file := $(shell mktemp)
-postinstall-vim: awk_find := /(libluajit|macos-vim).*\.dylib/ { print $$1 }
+postinstall-vim: awk_find := /(libluajit|libsodium|macos-vim).*\.dylib/ { print $$1 }
 postinstall-vim: awk_args := BEGIN { FS = "/"; OFS = "" } { print $$0, " ", "@executable_path/../", $$(NF-1), "/", $$(NF) }
 postinstall-vim: ## [subtarget] rewrite dylib paths
 	echo '$(exe_file)' | xargs otool -L | awk '$(awk_find)' | sort -u | awk '$(awk_args)' > '$(arg_file)'

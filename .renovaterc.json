@@ -51,6 +51,19 @@
         "/^Makefile$/"
       ],
       "matchStrings": [
+        "libsodium_version\\s*:?=\\s*(?<currentValue>\\S+)"
+      ],
+      "depNameTemplate": "libsodium",
+      "datasourceTemplate": "custom.libsodium",
+      "versioningTemplate": "loose",
+      "extractVersionTemplate": "^libsodium-(?<version>.+)\\.tar\\.gz$"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Makefile$/"
+      ],
+      "matchStrings": [
         "vim_version\\s*:?=\\s*(?<currentValue>\\S+)"
       ],
       "depNameTemplate": "vim/vim",
@@ -66,6 +79,10 @@
     },
     "libiconv": {
       "defaultRegistryUrlTemplate": "https://ftp.gnu.org/pub/gnu/libiconv/",
+      "format": "html"
+    },
+    "libsodium": {
+      "defaultRegistryUrlTemplate": "https://download.libsodium.org/libsodium/releases/",
       "format": "html"
     },
     "lua": {
