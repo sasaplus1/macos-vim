@@ -171,7 +171,7 @@ install-vim: ## [subtarget] install Vim
 # $ make install
 # $ make postinstall-vim
 .PHONY: postinstall-vim
-postinstall-vim: exe_file := $(shell find '$(abspath $(prefix)/bin)' -type f -perm -111 -print)
+postinstall-vim: exe_file := $(shell find '$(abspath $(prefix)/bin)' -type f -perm -111 -exec sh -c 'file "$$1" | grep -q Mach-O && echo "$$1"' _ {} \;)
 postinstall-vim: arg_file := $(shell mktemp)
 postinstall-vim: awk_find := /(libluajit|macos-vim).*\.dylib/ { print $$1 }
 postinstall-vim: awk_args := BEGIN { FS = "/"; OFS = "" } { print $$0, " ", "@executable_path/../", $$(NF-1), "/", $$(NF) }
