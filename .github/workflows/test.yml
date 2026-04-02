@@ -56,17 +56,24 @@ jobs:
           key: ${{ steps.archive-versions.outputs.key }}
           restore-keys: |
             archives-
-      - run: make
-      - run: test -f usr/src/libiconv-*.tar.gz || make download-libiconv
+      - id: versions
+        run: |
+          db=$(mktemp "$RUNNER_TEMP/make-db.XXXXXX")
+          make -np 2>/dev/null > "$db"
+          echo "libiconv=$(awk -F' := ' '/^libiconv_version/{print $2}' "$db")" >> "$GITHUB_OUTPUT"
+          echo "gettext=$(awk -F' := ' '/^gettext_version/{print $2}' "$db")" >> "$GITHUB_OUTPUT"
+          echo "lua=$(awk -F' := ' '/^lua_version/{print $2}' "$db")" >> "$GITHUB_OUTPUT"
+          echo "luajit=$(awk -F' := ' '/^luajit_version/{print $2}' "$db")" >> "$GITHUB_OUTPUT"
+      - run: test -f usr/src/libiconv-${{ steps.versions.outputs.libiconv }}.tar.gz || make download-libiconv
       - run: make install-libiconv
-      - run: test -f usr/src/gettext-*.tar.xz || make download-gettext
+      - run: test -f usr/src/gettext-${{ steps.versions.outputs.gettext }}.tar.xz || make download-gettext
       - run: make install-gettext
       - if: ${{ !matrix.luajit }}
-        run: test -f usr/src/lua-*.tar.gz || make download-lua
+        run: test -f usr/src/lua-${{ steps.versions.outputs.lua }}.tar.gz || make download-lua
       - if: ${{ !matrix.luajit }}
         run: make install-lua
       - if: matrix.luajit
-        run: test -f usr/src/LuaJIT-*.tar.gz || make download-luajit
+        run: test -f usr/src/LuaJIT-${{ steps.versions.outputs.luajit }}.tar.gz || make download-luajit
       - if: matrix.luajit
         run: make install-luajit
       - if: matrix.luajit
