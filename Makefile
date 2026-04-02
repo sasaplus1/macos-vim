@@ -38,7 +38,7 @@ gettext_configs := $(strip \
    --with-libiconv-prefix='$(prefix)' \
 )
 
-libiconv_version := 1.18
+libiconv_version := 1.19
 libiconv_configs := $(strip \
    --enable-option-checking \
    --disable-dependency-tracking \
