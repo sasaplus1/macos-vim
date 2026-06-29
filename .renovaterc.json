@@ -61,11 +61,11 @@
   ],
   "customDatasources": {
     "gettext": {
-      "defaultRegistryUrlTemplate": "https://ftp.gnu.org/pub/gnu/gettext/",
+      "defaultRegistryUrlTemplate": "https://ftpmirror.gnu.org/gettext/",
       "format": "html"
     },
     "libiconv": {
-      "defaultRegistryUrlTemplate": "https://ftp.gnu.org/pub/gnu/libiconv/",
+      "defaultRegistryUrlTemplate": "https://ftpmirror.gnu.org/libiconv/",
       "format": "html"
     },
     "lua": {
