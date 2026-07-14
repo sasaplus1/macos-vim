@@ -1,5 +1,7 @@
 ## sasaplus1/macos-vim
 
+/.envrc.local
+
 /usr/bin/**
 !/usr/bin/.gitkeep
 
