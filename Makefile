@@ -49,7 +49,7 @@ libiconv_configs := $(strip \
    --disable-nls \
 )
 
-lua_version := 5.5.0
+lua_version := 5.5.1
 luajit_version := 2.1.ROLLING
 
 vim_version := 9.2.0437
