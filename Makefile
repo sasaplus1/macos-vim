@@ -15,6 +15,15 @@ nproc := $(shell getconf _NPROCESSORS_ONLN)
 
 prefix ?= $(abspath $(root)/usr)
 
+# NOTE: --fail is required; without it curl saves the "404: Not Found" body
+#       as the archive and the failure only surfaces later at tar
+curl_options := $(strip \
+   --fail \
+   --location \
+   --retry 3 \
+   --retry-all-errors \
+)
+
 configure_configs := $(strip \
    -C \
    --prefix='$(prefix)' \
@@ -50,7 +59,7 @@ libiconv_configs := $(strip \
 )
 
 lua_version := 5.5.0
-luajit_version := 2.1.ROLLING
+luajit_version := 2.1
 
 vim_version := 9.2.0437
 vim_configs := $(strip \
@@ -97,23 +106,23 @@ install: download-vim install-vim postinstall-vim
 
 .PHONY: download-gettext
 download-gettext: ## [subtarget] download gettext archive
-	curl -L -o '$(root)/usr/src/gettext-$(gettext_version).tar.xz' https://ftpmirror.gnu.org/gettext/gettext-$(gettext_version).tar.xz
+	curl $(curl_options) -o '$(root)/usr/src/gettext-$(gettext_version).tar.xz' https://ftpmirror.gnu.org/gettext/gettext-$(gettext_version).tar.xz
 
 .PHONY: download-libiconv
 download-libiconv: ## [subtarget] download libiconv archive
-	curl -L -o '$(root)/usr/src/libiconv-$(libiconv_version).tar.gz' https://ftpmirror.gnu.org/libiconv/libiconv-$(libiconv_version).tar.gz
+	curl $(curl_options) -o '$(root)/usr/src/libiconv-$(libiconv_version).tar.gz' https://ftpmirror.gnu.org/libiconv/libiconv-$(libiconv_version).tar.gz
 
 .PHONY: download-lua
 download-lua: ## [subtarget] download Lua archive
-	curl -L -o '$(root)/usr/src/lua-$(lua_version).tar.gz' https://www.lua.org/ftp/lua-$(lua_version).tar.gz
+	curl $(curl_options) -o '$(root)/usr/src/lua-$(lua_version).tar.gz' https://www.lua.org/ftp/lua-$(lua_version).tar.gz
 
 .PHONY: download-luajit
 download-luajit: ## [subtarget] download LuaJIT archive
-	curl -L -o '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v$(luajit_version).tar.gz
+	curl $(curl_options) -o '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' https://github.com/LuaJIT/LuaJIT/archive/refs/heads/v$(luajit_version).tar.gz
 
 .PHONY: download-vim
 download-vim: ## [subtarget] download Vim archive
-	curl -L -o '$(root)/usr/src/v$(vim_version).tar.gz' https://github.com/vim/vim/archive/v$(vim_version).tar.gz
+	curl $(curl_options) -o '$(root)/usr/src/v$(vim_version).tar.gz' https://github.com/vim/vim/archive/v$(vim_version).tar.gz
 
 .PHONY: install-gettext
 install-gettext: CFLAGS := -I$(prefix)/include
@@ -140,21 +149,21 @@ install-lua: ## [subtarget] install Lua
 	make all install INSTALL_TOP='$(prefix)' -C '$(root)/usr/src/lua-$(lua_version)'
 
 .PHONY: install-luajit
-install-luajit: luajit_name := luajit-$(subst .ROLLING,,$(luajit_version))
+install-luajit: luajit_name := luajit-$(luajit_version)
 install-luajit: ## [subtarget] install LuaJIT
 	$(RM) -r '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	tar fvx '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' -C '$(root)/usr/src'
 	sed -i.bak -e '/-DLUAJIT_ENABLE_LUA52COMPAT/s/^#//' '$(root)/usr/src/LuaJIT-$(luajit_version)/Makefile'
 	MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) make -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
 	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
-	ln -sf '$(prefix)/bin/$(luajit_name).' '$(prefix)/bin/luajit'
+	# NOTE: LuaJIT's install already creates the $(prefix)/bin/luajit symlink
 	# why can't vim find lua.h with -I option in build?
 	cp '$(prefix)/include/$(luajit_name)/lua.h' '$(prefix)/include'
 
 .PHONY: install-vim
 install-vim: CFLAGS := -I$(prefix)/include
 ifeq ($(findstring --with-luajit,$(vim_configs)),--with-luajit)
-install-vim: CFLAGS += -I$(prefix)/include/luajit-$(subst .ROLLING,,$(luajit_version))
+install-vim: CFLAGS += -I$(prefix)/include/luajit-$(luajit_version)
 endif
 install-vim: LDFLAGS := -L$(prefix)/lib -Wl,-rpath,'@executable_path/../lib'
 install-vim: ## [subtarget] install Vim
