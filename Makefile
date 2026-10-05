@@ -59,7 +59,11 @@ libiconv_configs := $(strip \
 )
 
 lua_version := 5.5.0
+# NOTE: LuaJIT is rolling release only, so pin the v2.1 branch to a commit
+#       to keep the build reproducible
+#       https://luajit.org/download.html
 luajit_version := 2.1
+luajit_commit := c6ffc141a8762b41703f9287d63d93622a13dd8f
 
 vim_version := 9.2.0437
 vim_configs := $(strip \
@@ -118,7 +122,7 @@ download-lua: ## [subtarget] download Lua archive
 
 .PHONY: download-luajit
 download-luajit: ## [subtarget] download LuaJIT archive
-	curl $(curl_options) -o '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' https://github.com/LuaJIT/LuaJIT/archive/refs/heads/v$(luajit_version).tar.gz
+	curl $(curl_options) -o '$(root)/usr/src/LuaJIT-$(luajit_commit).tar.gz' https://github.com/LuaJIT/LuaJIT/archive/$(luajit_commit).tar.gz
 
 .PHONY: download-vim
 download-vim: ## [subtarget] download Vim archive
@@ -151,11 +155,11 @@ install-lua: ## [subtarget] install Lua
 .PHONY: install-luajit
 install-luajit: luajit_name := luajit-$(luajit_version)
 install-luajit: ## [subtarget] install LuaJIT
-	$(RM) -r '$(root)/usr/src/LuaJIT-$(luajit_version)'
-	tar fvx '$(root)/usr/src/LuaJIT-$(luajit_version).tar.gz' -C '$(root)/usr/src'
-	sed -i.bak -e '/-DLUAJIT_ENABLE_LUA52COMPAT/s/^#//' '$(root)/usr/src/LuaJIT-$(luajit_version)/Makefile'
-	MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) make -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
-	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_version)'
+	$(RM) -r '$(root)/usr/src/LuaJIT-$(luajit_commit)'
+	tar fvx '$(root)/usr/src/LuaJIT-$(luajit_commit).tar.gz' -C '$(root)/usr/src'
+	sed -i.bak -e '/-DLUAJIT_ENABLE_LUA52COMPAT/s/^#//' '$(root)/usr/src/LuaJIT-$(luajit_commit)/Makefile'
+	MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) make -C '$(root)/usr/src/LuaJIT-$(luajit_commit)'
+	make install PREFIX='$(prefix)' -C '$(root)/usr/src/LuaJIT-$(luajit_commit)'
 	# NOTE: LuaJIT's install already creates the $(prefix)/bin/luajit symlink
 	# why can't vim find lua.h with -I option in build?
 	cp '$(prefix)/include/$(luajit_name)/lua.h' '$(prefix)/include'

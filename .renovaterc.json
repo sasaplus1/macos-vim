@@ -51,6 +51,19 @@
         "/^Makefile$/"
       ],
       "matchStrings": [
+        "luajit_commit\\s*:?=\\s*(?<currentDigest>\\S+)"
+      ],
+      "depNameTemplate": "LuaJIT/LuaJIT",
+      "packageNameTemplate": "https://github.com/LuaJIT/LuaJIT",
+      "currentValueTemplate": "v2.1",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Makefile$/"
+      ],
+      "matchStrings": [
         "vim_version\\s*:?=\\s*(?<currentValue>\\S+)"
       ],
       "depNameTemplate": "vim/vim",
