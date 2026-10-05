@@ -48,7 +48,7 @@ jobs:
         run: echo "name=$(arch)" | tee -a "$GITHUB_OUTPUT"
       - id: archive-versions
         run: |
-          key=$(grep -E '(gettext|libiconv|lua|luajit)_version' Makefile | sort | shasum -a 1 | cut -d ' ' -f 1)
+          key=$(grep -E '(gettext|libiconv|lua|luajit)_(version|commit)' Makefile | sort | shasum -a 1 | cut -d ' ' -f 1)
           echo "key=archives-$key" >> "$GITHUB_OUTPUT"
       - uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
@@ -64,7 +64,7 @@ jobs:
             echo "libiconv=$(awk -F' := ' '/^libiconv_version/{print $2}' "$db")"
             echo "gettext=$(awk -F' := ' '/^gettext_version/{print $2}' "$db")"
             echo "lua=$(awk -F' := ' '/^lua_version/{print $2}' "$db")"
-            echo "luajit=$(awk -F' := ' '/^luajit_version/{print $2}' "$db")"
+            echo "luajit_commit=$(awk -F' := ' '/^luajit_commit/{print $2}' "$db")"
           } >> "$GITHUB_OUTPUT"
       - run: test -f usr/src/libiconv-${{ steps.versions.outputs.libiconv }}.tar.gz || make download-libiconv
       - run: make install-libiconv
@@ -75,7 +75,7 @@ jobs:
       - if: ${{ !matrix.luajit }}
         run: make install-lua
       - if: matrix.luajit
-        run: test -f usr/src/LuaJIT-${{ steps.versions.outputs.luajit }}.tar.gz || make download-luajit
+        run: test -f usr/src/LuaJIT-${{ steps.versions.outputs.luajit_commit }}.tar.gz || make download-luajit
       - if: matrix.luajit
         run: make install-luajit
       - if: matrix.luajit
