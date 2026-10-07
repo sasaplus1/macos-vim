@@ -58,7 +58,7 @@ libiconv_configs := $(strip \
    --disable-nls \
 )
 
-lua_version := 5.5.0
+lua_version := 5.5.1
 # NOTE: LuaJIT is rolling release only, so pin the v2.1 branch to a commit
 #       to keep the build reproducible
 #       https://luajit.org/download.html
