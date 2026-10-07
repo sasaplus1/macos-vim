@@ -5,6 +5,18 @@
     "local>sasaplus1/renovate-config:automerge-all.json5",
     ":assignee(sasaplus1)"
   ],
+  "packageRules": [
+    {
+      "description": "allow the cooldown to pass for datasources that return no releaseTimestamp",
+      "matchDatasources": [
+        "custom.gettext",
+        "custom.libiconv",
+        "custom.lua",
+        "git-refs"
+      ],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
