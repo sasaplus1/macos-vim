@@ -20,9 +20,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          # arm64
-          - macos-14
           - macos-15
+          - macos-26
         luajit:
           - ''
           - luajit
