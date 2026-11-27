@@ -63,7 +63,7 @@ lua_version := 5.5.1
 #       to keep the build reproducible
 #       https://luajit.org/download.html
 luajit_version := 2.1
-luajit_commit := c6ffc141a8762b41703f9287d63d93622a13dd8f
+luajit_commit := 3bfb8fa4ab970b36d42d108ead04e92341c49998
 
 vim_version := 9.2.1167
 vim_configs := $(strip \
