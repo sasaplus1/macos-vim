@@ -65,7 +65,7 @@ lua_version := 5.5.1
 luajit_version := 2.1
 luajit_commit := 3bfb8fa4ab970b36d42d108ead04e92341c49998
 
-vim_version := 9.2.1167
+vim_version := 9.2.1373
 vim_configs := $(strip \
   --enable-fail-if-missing \
   --disable-smack \
